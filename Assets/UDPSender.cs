@@ -38,6 +38,8 @@ public class UDPSender : MonoBehaviour
   Text out_gyro;
   [SerializeField]
   Text gyro_label;
+  [SerializeField]
+  Text own_ip_address;
 
   // gyroscope
   private Gyroscope gyro;
@@ -90,6 +92,8 @@ public class UDPSender : MonoBehaviour
 
   public void Start()
   {
+    own_ip_address.text = GetLocalIPAddress().ToString();
+
     valid_connection = false;
     valid_input = false;
     gyro_enabled = false;
@@ -119,7 +123,7 @@ public class UDPSender : MonoBehaviour
       remoteEndPoint = new IPEndPoint(IPAddress.Parse(ip), Int32.Parse(port));
       client = new UdpClient();
 
-      mac = GetMacAddress().ToString();
+      mac = GetLocalIPAddress().ToString();
 
       Debug.Log("Connection Established");
     }
@@ -158,5 +162,18 @@ public class UDPSender : MonoBehaviour
         return nic.GetPhysicalAddress();
     }
     return null;
+  }
+
+  public static string GetLocalIPAddress()
+  {
+    var host = Dns.GetHostEntry(Dns.GetHostName());
+    foreach (var ip in host.AddressList)
+    {
+      if (ip.AddressFamily == AddressFamily.InterNetwork)
+      {
+        return ip.ToString();
+      }
+    }
+    throw new Exception("No network adapters with an IPv4 address in the system!");
   }
 }
