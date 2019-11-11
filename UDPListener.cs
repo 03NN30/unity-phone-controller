@@ -15,7 +15,8 @@ public class UDPListener : MonoBehaviour
   [SerializeField]
   int port;
 
-  string text;
+  [HideInInspector]
+  public string text;
 
   // start from unity3d
   public void Start()
