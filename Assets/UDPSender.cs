@@ -154,16 +154,6 @@ public class UDPSender : MonoBehaviour
     }
   }
 
-  public static PhysicalAddress GetMacAddress()
-  {
-    foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
-    {
-      if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet && nic.OperationalStatus == OperationalStatus.Up)
-        return nic.GetPhysicalAddress();
-    }
-    return null;
-  }
-
   public static string GetLocalIPAddress()
   {
     var host = Dns.GetHostEntry(Dns.GetHostName());
