@@ -17,6 +17,8 @@ public class UDPSender : MonoBehaviour
   private IPEndPoint remoteEndPoint;
   private UdpClient client;
 
+  private string message;
+
   // use mac address to identify every player
   private string mac;
 
@@ -34,17 +36,39 @@ public class UDPSender : MonoBehaviour
   Button connect;
   [SerializeField]
   Button send;
+
   [SerializeField]
   Text out_gyro;
   [SerializeField]
   Text gyro_label;
   [SerializeField]
+  Toggle gyro_toggle;
+  [SerializeField]
+  Image gyro_toggle_image;
+
+  [SerializeField]
+  Text accelerometer_label;
+  [SerializeField]
+  Text out_accelerometer;
+  [SerializeField]
+  Toggle accelerometer_toggle;
+  [SerializeField]
+  Image accelerometer_toggle_image;
+
+  [SerializeField]
   Text own_ip_address;
+  [SerializeField]
+  Text last_message_sent;
 
   // gyroscope
   private Gyroscope gyro;
   private Quaternion gyro_rotation;
+  private Quaternion prev_gyro_rotation = new Quaternion();
   private bool gyro_enabled;
+
+  // accelerometer
+  private bool accelerometer_enabled;
+  private Vector3 prev_accelerometer = new Vector3();
 
   void OnEnable()
   {
@@ -97,6 +121,26 @@ public class UDPSender : MonoBehaviour
     valid_connection = false;
     valid_input = false;
     gyro_enabled = false;
+    accelerometer_enabled = false;
+
+    // on by default
+    gyro_toggle.isOn = true;
+    accelerometer_toggle.isOn = true;
+
+    // accelerometer
+    if (SystemInfo.supportsAccelerometer)
+    {
+      accelerometer_enabled = true;
+    }
+    else
+    {
+      Debug.LogError("Your device doesn't have an accelerometer");
+
+      // hide accelerometer label
+      out_accelerometer.text = "not supported by this device";
+      accelerometer_toggle.isOn = false;
+      accelerometer_toggle_image.color = Color.grey;
+    }
 
     // gyroscope
     if (SystemInfo.supportsGyroscope)
@@ -110,12 +154,17 @@ public class UDPSender : MonoBehaviour
       Debug.LogError("Your device doesn't have a gyroscope");
 
       // hide gyroscope label
-      gyro_label.enabled = false;
+      out_gyro.text = "not supported by this device";
+      gyro_toggle.isOn = false;
+      gyro_toggle_image.color = Color.grey;
     }
   }
 
   public void Update()
   {
+    // delete content of last message
+    message = "";
+
     if (valid_input && !valid_connection)
     {
       valid_connection = true;
@@ -128,16 +177,39 @@ public class UDPSender : MonoBehaviour
       Debug.Log("Connection Established");
     }
 
-    if (gyro_enabled)
+    if (gyro_enabled && gyro_toggle.isOn)
     {
       gyro_rotation = gyro.attitude;
 
+      // only send if field has changed
+      if (prev_gyro_rotation != gyro_rotation)
+      {
+        message += "_G_" + gyro_rotation.ToString();
+      }
+      prev_gyro_rotation = gyro_rotation;
+
       // print gyro rotation to screen
       out_gyro.text = gyro_rotation.ToString();
+    }
+
+    if (accelerometer_enabled && accelerometer_toggle.isOn)
+    {
+      Vector3 temp = Input.acceleration;
+
+      if (prev_accelerometer != temp)
+        message += "_A_" + temp.ToString();
+
+      out_accelerometer.text = temp.ToString();
+    }
+
+    // only send message if not empty
+    if (message.Length > 0 && valid_connection)
+    {
+      Send(mac + message);
+
+      last_message_sent.text = mac + message;
 
       /* TODO: add adjustable rate */
-      if (valid_connection)
-        Send(mac + "_" + gyro_rotation.ToString());
     }
   }
 
