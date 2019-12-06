@@ -184,7 +184,7 @@ public class UDPSender : MonoBehaviour
       // only send if field has changed
       if (prev_gyro_rotation != gyro_rotation)
       {
-        message += "_G_" + gyro_rotation.ToString();
+        message += "{G" + gyro_rotation.ToString() + "}";
       }
       prev_gyro_rotation = gyro_rotation;
 
@@ -197,7 +197,7 @@ public class UDPSender : MonoBehaviour
       Vector3 temp = Input.acceleration;
 
       if (prev_accelerometer != temp)
-        message += "_A_" + temp.ToString();
+        message += "{A" + temp.ToString() + "}";
 
       out_accelerometer.text = temp.ToString();
     }
@@ -205,9 +205,9 @@ public class UDPSender : MonoBehaviour
     // only send message if not empty
     if (message.Length > 0 && valid_connection)
     {
-      Send(mac + message);
+      Send("{" + mac + "}" + message);
 
-      last_message_sent.text = mac + message;
+      last_message_sent.text = "{" + mac + "}" + message;
 
       /* TODO: add adjustable rate */
     }
