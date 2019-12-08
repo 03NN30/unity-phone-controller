@@ -35,6 +35,7 @@ public class PlayerSelection : MonoBehaviour
     hide();
     // requires implementation of a back to channel for verficiation
     gameScreen.GetComponent<PlayerLogic>().show();
+    gameScreen.GetComponent<PlayerLogic>().role = "Commander";
   }
 
   private void OfficerPressed()
@@ -42,6 +43,7 @@ public class PlayerSelection : MonoBehaviour
     hide();
     // requires implementation of a back to channel for verficiation
     gameScreen.GetComponent<PlayerLogic>().show();
+    gameScreen.GetComponent<PlayerLogic>().role = "Officer";
   }
 
   void Start()

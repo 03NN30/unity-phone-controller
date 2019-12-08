@@ -22,6 +22,12 @@ public class PlayerLogic : MonoBehaviour
   [SerializeField]
   Text errorMessage;
 
+  [SerializeField]
+  Joystick joystick;
+
+  [HideInInspector]
+  public string role;
+
   // use own local IP address to identify player
   private string localIP;
 
@@ -44,6 +50,8 @@ public class PlayerLogic : MonoBehaviour
   void Start()
   {
     hide();
+
+    joystick = FindObjectOfType<Joystick>();
 
     valid_connection = false;
     valid_input = false;
@@ -98,6 +106,20 @@ public class PlayerLogic : MonoBehaviour
     // only send message if not empty
     if (message.Length > 0 && valid_connection)
     {
+      string roleNumber = "-1";
+      // send joystick data
+      if (role == "Commander")
+        roleNumber = "1";
+      else if (role == "Officer")
+        roleNumber = "2";
+
+      message += "{" + roleNumber + ":" + joystick.Horizontal + "," + joystick.Vertical + "}";
+
+      /*
+       * TODO: Add fire button (pay attention to reload and fire button)
+       */
+
+      // send final message
       Send("{" + localIP + "}" + message);
     }
   }
