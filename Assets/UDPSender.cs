@@ -5,7 +5,6 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine.UI;
-using System.Net.NetworkInformation;
 using System.Text.RegularExpressions;
 
 public class UDPSender : MonoBehaviour
@@ -209,7 +208,7 @@ public class UDPSender : MonoBehaviour
 
       last_message_sent.text = "{" + mac + "}" + message;
 
-      /* TODO: add adjustable rate */
+      /* TODO: add adjustable tick rate */
     }
   }
 
