@@ -24,6 +24,10 @@ public class PlayerLogic : MonoBehaviour
 
   [SerializeField]
   Joystick joystick;
+  [SerializeField]
+  Button action;
+
+  bool actionButtonPressed;
 
   [HideInInspector]
   public string role;
@@ -34,6 +38,16 @@ public class PlayerLogic : MonoBehaviour
   // accelerometer
   private bool accelerometer_enabled;
   private Vector3 prev_accelerometer = new Vector3();
+
+  private void OnEnable()
+  {
+    action.onClick.AddListener(ActionPressed);
+  }
+
+  private void ActionPressed()
+  {
+    actionButtonPressed = true;
+  }
 
   public void hide()
   {
@@ -113,10 +127,18 @@ public class PlayerLogic : MonoBehaviour
       else if (role == "Officer")
         roleNumber = "2";
 
-      message += "{" + roleNumber + ":" + joystick.Horizontal + "," + joystick.Vertical + "}";
+      message += "{R(" + roleNumber + ")}{J(" + joystick.Horizontal + "," + joystick.Vertical + ")}";
+
+      if (actionButtonPressed)
+      {
+        actionButtonPressed = false;
+        message += "{B(1)}";
+      }
 
       /*
        * TODO: Add fire button (pay attention to reload and fire button)
+       *       Add TCP or similar like channel for communicating backwards
+       *       maybe button requires TCP for higher percision
        */
 
       // send final message
