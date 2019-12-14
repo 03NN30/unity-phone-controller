@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Text.RegularExpressions;
+using System;
 
 public class ManualConfiguration : MonoBehaviour
 {
@@ -44,7 +45,7 @@ public class ManualConfiguration : MonoBehaviour
     {
       ConnectionData temp = connectionData.GetComponent<ConnectionData>();
       temp.selectedIP = inIP.text;
-      temp.selectedPort = inPort.text;
+      temp.selectedPort = Int32.Parse(inPort.text);
 
       gameScreen.GetComponent<PlayerLogic>().valid_input = true;
       connect.image.color = Color.green;

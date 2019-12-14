@@ -1880,8 +1880,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedIP: 
-  selectedPort: 
-  port: 5555
+  selectedPort: 0
+  portOut: 5555
+  portIn: 5556
   domeIP: 
   weIP: 192.168.2.100
   smIP: 192.168.178.37
@@ -2404,11 +2405,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   valid_input: 0
+  valid_connection: 0
   connectionData: {fileID: 686956440}
   errorMessage: {fileID: 2013463948}
   joystick: {fileID: 2118501558}
   action: {fileID: 1749018794}
   role: 
+  localIP: 
 --- !u!1 &1101374553
 GameObject:
   m_ObjectHideFlags: 0
@@ -2811,7 +2814,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   confirmCommander: {fileID: 1519819348}
   confirmOfficer: {fileID: 1002884505}
+  portIn: 5556
+  connectionData: {fileID: 686956440}
   gameScreen: {fileID: 1058428187}
+  printToConsole: 0
+  receivedMessage: 
 --- !u!1 &1329735217
 GameObject:
   m_ObjectHideFlags: 0

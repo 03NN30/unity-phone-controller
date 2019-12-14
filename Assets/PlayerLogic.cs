@@ -12,7 +12,8 @@ public class PlayerLogic : MonoBehaviour
 
   [HideInInspector]
   public bool valid_input;
-  private bool valid_connection;
+  [HideInInspector]
+  public bool valid_connection;
 
   private string message;
 
@@ -33,7 +34,8 @@ public class PlayerLogic : MonoBehaviour
   public string role;
 
   // use own local IP address to identify player
-  private string localIP;
+  [HideInInspector]
+  public string localIP;
 
   // accelerometer
   private bool accelerometer_enabled;
@@ -89,25 +91,6 @@ public class PlayerLogic : MonoBehaviour
     // delete content of last message
     message = "";
 
-    if (valid_input && !valid_connection)
-    {
-      valid_connection = true;
-
-      Debug.Log(connectionData.GetComponent<ConnectionData>().selectedIP);
-      Debug.Log(connectionData.GetComponent<ConnectionData>().selectedPort);
-
-      remoteEndPoint = new IPEndPoint(
-        IPAddress.Parse(connectionData.GetComponent<ConnectionData>().selectedIP), 
-        Int32.Parse(connectionData.GetComponent<ConnectionData>().selectedPort)
-      );
-
-      client = new UdpClient();
-
-      localIP = GetLocalIPAddress().ToString();
-
-      Debug.Log("Connection Established");
-    }
-
     // send data for horizontal and vertical movement using the accelerometer
     if (accelerometer_enabled)
     {
@@ -157,18 +140,5 @@ public class PlayerLogic : MonoBehaviour
     {
       print(e.ToString());
     }
-  }
-
-  public static string GetLocalIPAddress()
-  {
-    var host = Dns.GetHostEntry(Dns.GetHostName());
-    foreach (var ip in host.AddressList)
-    {
-      if (ip.AddressFamily == AddressFamily.InterNetwork)
-      {
-        return ip.ToString();
-      }
-    }
-    throw new Exception("No network adapters with an IPv4 address in the system!");
   }
 }
