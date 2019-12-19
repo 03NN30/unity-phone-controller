@@ -750,8 +750,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 117}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 12.4, y: 117}
+  m_SizeDelta: {x: 184.8, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &196422264
 MonoBehaviour:
@@ -1042,7 +1042,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Confirm
+  m_Text: Select
 --- !u!222 &374128168
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1883,7 +1883,7 @@ MonoBehaviour:
   selectedPort: 0
   portOut: 5555
   portIn: 5556
-  domeIP: 
+  domeIP: 141.54.159.119
   weIP: 192.168.2.100
   smIP: 192.168.178.37
 --- !u!4 &686956442
@@ -2407,6 +2407,7 @@ MonoBehaviour:
   valid_input: 0
   valid_connection: 0
   connectionData: {fileID: 686956440}
+  playerSelection: {fileID: 1143124262}
   errorMessage: {fileID: 2013463948}
   joystick: {fileID: 2118501558}
   action: {fileID: 1749018794}
@@ -2817,7 +2818,8 @@ MonoBehaviour:
   portIn: 5556
   connectionData: {fileID: 686956440}
   gameScreen: {fileID: 1058428187}
-  printToConsole: 0
+  printMessageIn: 0
+  printMessageOut: 0
   receivedMessage: 
 --- !u!1 &1329735217
 GameObject:
@@ -3729,7 +3731,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Confirm
+  m_Text: Select
 --- !u!222 &1771784881
 CanvasRenderer:
   m_ObjectHideFlags: 0

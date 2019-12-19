@@ -9,7 +9,8 @@ using System.Threading;
 public class PlayerSelection : MonoBehaviour
 {
   // sending
-  private IPEndPoint remoteEndPoint;
+  [HideInInspector]
+  public IPEndPoint remoteEndPoint;
   [HideInInspector]
   public UdpClient client;
 
@@ -26,7 +27,9 @@ public class PlayerSelection : MonoBehaviour
   GameObject gameScreen;
 
   [SerializeField]
-  bool printToConsole;
+  bool printMessageIn;
+  [SerializeField]
+  bool printMessageOut;
 
   // receiving
   [HideInInspector]
@@ -34,6 +37,8 @@ public class PlayerSelection : MonoBehaviour
 
   private bool commanderAvailable;
   private bool officerAvailable;
+
+  bool active = false;
 
   private void OnEnable()
   {
@@ -43,12 +48,14 @@ public class PlayerSelection : MonoBehaviour
 
   public void hide()
   {
+    active = false;
     GetComponent<CanvasGroup>().alpha = 0f;
     GetComponent<CanvasGroup>().blocksRaycasts = false;
   }
 
   public void show()
   {
+    active = true;
     GetComponent<CanvasGroup>().alpha = 1f;
     GetComponent<CanvasGroup>().blocksRaycasts = true;
   }
@@ -58,9 +65,11 @@ public class PlayerSelection : MonoBehaviour
     if (commanderAvailable)
     {
       hide();
-      // requires implementation of a back to channel for verficiation
       gameScreen.GetComponent<PlayerLogic>().show();
       gameScreen.GetComponent<PlayerLogic>().role = "Commander";
+      
+      // once received it will send a confirmation message back
+      Send("{" + GetLocalIPAddress() + "}{R(C)}");
     }
   }
 
@@ -69,9 +78,11 @@ public class PlayerSelection : MonoBehaviour
     if (officerAvailable)
     {
       hide();
-      // requires implementation of a back to channel for verficiation
       gameScreen.GetComponent<PlayerLogic>().show();
       gameScreen.GetComponent<PlayerLogic>().role = "Officer";
+      
+      // once received it will send a confirmation message back
+      Send("{" + GetLocalIPAddress() + "}{R(O)}");
     }
   }
 
@@ -94,7 +105,8 @@ public class PlayerSelection : MonoBehaviour
           byte[] data = self.Receive(ref ip);
 
           receivedMessage = Encoding.UTF8.GetString(data);
-          if (printToConsole)
+
+          if (printMessageIn)
             Debug.Log(receivedMessage);
         }
         catch (Exception e)
@@ -113,68 +125,71 @@ public class PlayerSelection : MonoBehaviour
 
   void Update()
   {
-    // establishing connection
-    if (gameScreen.GetComponent<PlayerLogic>().valid_input && !gameScreen.GetComponent<PlayerLogic>().valid_connection)
+    if (active)
     {
-      gameScreen.GetComponent<PlayerLogic>().valid_connection = true;
+      // establishing connection
+      if (gameScreen.GetComponent<PlayerLogic>().valid_input && !gameScreen.GetComponent<PlayerLogic>().valid_connection)
+      {
+        gameScreen.GetComponent<PlayerLogic>().valid_connection = true;
 
-      Debug.Log(connectionData.GetComponent<ConnectionData>().selectedIP);
-      Debug.Log(connectionData.GetComponent<ConnectionData>().selectedPort);
+        remoteEndPoint = new IPEndPoint(
+          IPAddress.Parse(connectionData.GetComponent<ConnectionData>().selectedIP),
+          connectionData.GetComponent<ConnectionData>().selectedPort
+        );
 
-      remoteEndPoint = new IPEndPoint(
-        IPAddress.Parse(connectionData.GetComponent<ConnectionData>().selectedIP),
-        connectionData.GetComponent<ConnectionData>().selectedPort
-      );
+        client = new UdpClient();
 
-      client = new UdpClient();
+        gameScreen.GetComponent<PlayerLogic>().localIP = GetLocalIPAddress().ToString();
 
-      gameScreen.GetComponent<PlayerLogic>().localIP = GetLocalIPAddress().ToString();
+        Debug.Log("Connection Established");
+      }
 
-      Debug.Log("Connection Established");
-      Debug.LogError("Connection Established, Sending message");
-      // once received it will send a confirmation message back
-      Send("{" + GetLocalIPAddress() + "}{R(?)}");
+      if (gameScreen.GetComponent<PlayerLogic>().valid_connection)
+      {
+        /*
+         * Once this message is sent, the server will answer by telling about the availability of all
+         * possible player roles.
+         */
+        Send("{" + GetLocalIPAddress() + "}{R(?)}");
+      }
+
+      if (receivedMessage == "{R(O:0)(C:0)}")
+      {
+        officerAvailable = false;
+        commanderAvailable = false;
+      }
+      else if (receivedMessage == "{R(O:0)(C:1)}")
+      {
+        officerAvailable = false;
+        commanderAvailable = true;
+      }
+      else if (receivedMessage == "{R(O:1)(C:0)}")
+      {
+        officerAvailable = true;
+        commanderAvailable = false;
+      }
+      else if (receivedMessage == "{R(O:1)(C:1)}")
+      {
+        officerAvailable = true;
+        commanderAvailable = true;
+      }
+
+      if (!officerAvailable)
+        confirmOfficer.image.color = Color.grey;
+      else
+        confirmOfficer.image.color = Color.white;
+
+      if (!commanderAvailable)
+        confirmCommander.image.color = Color.grey;
+      else
+        confirmCommander.image.color = Color.white;
     }
-    else
-    {
-      Debug.LogError("well this is more than weird");
-    }
-
-    if (receivedMessage == "{R(O:0)(C:0)}")
-    {
-      officerAvailable = false;
-      commanderAvailable = false;
-    }
-    else if (receivedMessage == "{R(O:0)(C:1)}")
-    {
-      officerAvailable = false;
-      commanderAvailable = true;
-    }
-    else if (receivedMessage == "{R(O:1)(C:0)}")
-    {
-      officerAvailable = true;
-      commanderAvailable = false;
-    }
-    else if (receivedMessage == "{R(O:1)(C:1)}")
-    {
-      officerAvailable = true;
-      commanderAvailable = true;
-    }
-
-
-    if (!officerAvailable)
-      confirmOfficer.image.color = Color.grey;
-    else
-      confirmOfficer.image.color = Color.white;
-
-    if (!commanderAvailable)
-      confirmCommander.image.color = Color.grey;
-    else
-      confirmCommander.image.color = Color.white;
   }
 
   private void Send(string message)
   {
+    if (printMessageOut)
+      Debug.Log(message);
     try
     {
       byte[] data = Encoding.UTF8.GetBytes(message);

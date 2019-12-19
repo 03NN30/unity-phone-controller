@@ -64,9 +64,4 @@ public class ManualConfiguration : MonoBehaviour
   {
     hide();
   }
-
-  void Update()
-  {
-    
-  }
 }

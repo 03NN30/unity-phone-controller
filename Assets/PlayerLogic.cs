@@ -7,9 +7,6 @@ using UnityEngine.UI;
 
 public class PlayerLogic : MonoBehaviour
 {
-  private IPEndPoint remoteEndPoint;
-  private UdpClient client;
-
   [HideInInspector]
   public bool valid_input;
   [HideInInspector]
@@ -19,6 +16,8 @@ public class PlayerLogic : MonoBehaviour
 
   [SerializeField]
   GameObject connectionData;
+  [SerializeField]
+  GameObject playerSelection;
 
   [SerializeField]
   Text errorMessage;
@@ -29,6 +28,7 @@ public class PlayerLogic : MonoBehaviour
   Button action;
 
   bool actionButtonPressed;
+  bool active = false;
 
   [HideInInspector]
   public string role;
@@ -53,12 +53,14 @@ public class PlayerLogic : MonoBehaviour
 
   public void hide()
   {
+    active = false;
     GetComponent<CanvasGroup>().alpha = 0f;
     GetComponent<CanvasGroup>().blocksRaycasts = false;
   }
 
   public void show()
   {
+    active = true;
     GetComponent<CanvasGroup>().alpha = 1f;
     GetComponent<CanvasGroup>().blocksRaycasts = true;
   }
@@ -88,44 +90,50 @@ public class PlayerLogic : MonoBehaviour
 
   void Update()
   {
-    // delete content of last message
-    message = "";
-
-    // send data for horizontal and vertical movement using the accelerometer
-    if (accelerometer_enabled)
+    if (active)
     {
-      Vector3 temp = Input.acceleration;
-
-      if (prev_accelerometer != temp)
-        message += "{A" + temp.ToString() + "}";
-    }
-
-    // only send message if not empty
-    if (message.Length > 0 && valid_connection)
-    {
-      string roleNumber = "-1";
-      // send joystick data
-      if (role == "Commander")
-        roleNumber = "1";
-      else if (role == "Officer")
-        roleNumber = "2";
-
-      message += "{R(" + roleNumber + ")}{J(" + joystick.Horizontal + "," + joystick.Vertical + ")}";
-
-      if (actionButtonPressed)
+      if (role == "Officer" || role == "Commander")
       {
-        actionButtonPressed = false;
-        message += "{B(1)}";
+        // delete content of last message
+        message = "";
+
+        // send data for horizontal and vertical movement using the accelerometer
+        if (accelerometer_enabled)
+        {
+          Vector3 temp = Input.acceleration;
+
+          if (prev_accelerometer != temp)
+            message += "{A" + temp.ToString() + "}";
+        }
+
+        // only send message if not empty
+        if (message.Length > 0 && valid_connection)
+        {
+          string roleNumber = "-1";
+          // send joystick data
+          if (role == "Commander")
+            roleNumber = "1";
+          else if (role == "Officer")
+            roleNumber = "2";
+
+          message += "{R(" + roleNumber + ")}{J(" + joystick.Horizontal + "," + joystick.Vertical + ")}";
+
+          if (actionButtonPressed)
+          {
+            actionButtonPressed = false;
+            message += "{B(1)}";
+          }
+
+          /*
+           * TODO: Add fire button (pay attention to reload and fire button)
+           *       Add TCP or similar like channel for communicating backwards
+           *       maybe button requires TCP for higher percision
+           */
+
+          // send final message
+          Send("{" + localIP + "}" + message);
+        }
       }
-
-      /*
-       * TODO: Add fire button (pay attention to reload and fire button)
-       *       Add TCP or similar like channel for communicating backwards
-       *       maybe button requires TCP for higher percision
-       */
-
-      // send final message
-      Send("{" + localIP + "}" + message);
     }
   }
 
@@ -134,7 +142,11 @@ public class PlayerLogic : MonoBehaviour
     try
     {
       byte[] data = Encoding.UTF8.GetBytes(message);
-      client.Send(data, data.Length, remoteEndPoint);
+      playerSelection.GetComponent<PlayerSelection>().client.Send(
+        data,
+        data.Length,
+        playerSelection.GetComponent<PlayerSelection>().remoteEndPoint
+        );
     }
     catch (Exception e)
     {
