@@ -13,11 +13,16 @@ public class PlayerLogic : MonoBehaviour
   public bool valid_connection;
 
   private string message;
+  int currentLevel = 1;
 
   [SerializeField]
   GameObject connectionData;
   [SerializeField]
   GameObject playerSelection;
+  [SerializeField]
+  GameObject actualJoystick;
+  [SerializeField]
+  Text actionButtonText;
 
   [SerializeField]
   Text errorMessage;
@@ -92,6 +97,13 @@ public class PlayerLogic : MonoBehaviour
   {
     if (active)
     {
+      if (playerSelection.GetComponent<PlayerSelection>().receivedMessage != null || playerSelection.GetComponent<PlayerSelection>().receivedMessage != "")
+      {
+        int foundLevel = playerSelection.GetComponent<PlayerSelection>().receivedMessage.IndexOf("{L(");
+        if (foundLevel != -1)
+          currentLevel = Int32.Parse(playerSelection.GetComponent<PlayerSelection>().receivedMessage.Substring(foundLevel + 3, 1));
+      }
+
       if (role == "Officer" || role == "Commander")
       {
         // delete content of last message
@@ -106,6 +118,38 @@ public class PlayerLogic : MonoBehaviour
             message += "{A" + temp.ToString() + "}";
         }
 
+        if (currentLevel == 1)
+        {
+          // in here also check for role ("Commander" or "Officer") to give them different UI
+
+          actualJoystick.SetActive(false);
+
+          if (role == "Commander")
+          {
+            actionButtonText.text = "Reload";
+          }
+          else if (role == "Officer")
+          {
+            actionButtonText.text = "Fire";
+          }
+        }
+        else if (currentLevel == 2)
+        {
+          // in here also check for role ("Commander" or "Officer") to give them different UI
+
+          actualJoystick.SetActive(true);
+          message += "{ J(" + joystick.Horizontal + ", " + joystick.Vertical + ")}";
+
+          if (role == "Officer")
+          {
+            actionButtonText.text = "Reload";
+          }
+          else if (role == "Commander")
+          {
+            actionButtonText.text = "Fire";
+          }
+        }
+
         // only send message if not empty
         if (message.Length > 0 && valid_connection)
         {
@@ -116,7 +160,7 @@ public class PlayerLogic : MonoBehaviour
           else if (role == "Officer")
             roleNumber = "2";
 
-          message += "{R(" + roleNumber + ")}{J(" + joystick.Horizontal + "," + joystick.Vertical + ")}";
+          message += "{R(" + roleNumber + ")}";
 
           if (actionButtonPressed)
           {
