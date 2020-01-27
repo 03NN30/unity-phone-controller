@@ -34,6 +34,7 @@ public class PlayerLogic : MonoBehaviour
 
   bool actionButtonPressed;
   bool active = false;
+  bool actionCoolDown = false;
 
   [HideInInspector]
   public string role;
@@ -46,6 +47,9 @@ public class PlayerLogic : MonoBehaviour
   private bool accelerometer_enabled;
   private Vector3 prev_accelerometer = new Vector3();
 
+  float period = 5f;
+  float timeOnActionClick = 0f;
+
   private void OnEnable()
   {
     action.onClick.AddListener(ActionPressed);
@@ -53,7 +57,18 @@ public class PlayerLogic : MonoBehaviour
 
   private void ActionPressed()
   {
-    actionButtonPressed = true;
+    timeOnActionClick = Time.time;
+
+    //if (!actionCoolDown)
+    if (!actionCoolDown)
+    {
+      Debug.Log("sending message button pressed");
+      message += "{B(1)}";
+    }
+   // else
+      //actionButtonPressed = false;
+
+    actionCoolDown = true;
   }
 
   public void hide()
@@ -78,6 +93,8 @@ public class PlayerLogic : MonoBehaviour
 
     valid_connection = false;
     valid_input = false;
+
+    action.image.color = Color.green;
 
     accelerometer_enabled = false;
 
@@ -138,7 +155,7 @@ public class PlayerLogic : MonoBehaviour
           // in here also check for role ("Commander" or "Officer") to give them different UI
 
           actualJoystick.SetActive(true);
-          message += "{ J(" + joystick.Horizontal + ", " + joystick.Vertical + ")}";
+          message += "{J(" + joystick.Horizontal + ", " + joystick.Vertical + ")}";
 
           if (role == "Officer")
           {
@@ -149,6 +166,21 @@ public class PlayerLogic : MonoBehaviour
             actionButtonText.text = "Fire";
           }
         }
+
+        if (actionCoolDown)
+        {
+          action.enabled = false;
+
+          if (Time.time - timeOnActionClick > period)
+          {
+            actionCoolDown = false;
+            action.image.color = Color.green;
+          }
+          else
+            action.image.color = Color.red;
+        }
+        else
+          action.enabled = true;
 
         // only send message if not empty
         if (message.Length > 0 && valid_connection)
@@ -161,12 +193,6 @@ public class PlayerLogic : MonoBehaviour
             roleNumber = "2";
 
           message += "{R(" + roleNumber + ")}";
-
-          if (actionButtonPressed)
-          {
-            actionButtonPressed = false;
-            message += "{B(1)}";
-          }
 
           /*
            * TODO: Add fire button (pay attention to reload and fire button)

@@ -474,6 +474,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Fixed Joystick
       objectReference: {fileID: 0}
+    - target: {fileID: 2929252283123773939, guid: aaa2c939c0359ac4dbce3f49e8b90252,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2929252283123773938, guid: aaa2c939c0359ac4dbce3f49e8b90252,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -594,6 +599,11 @@ PrefabInstance:
       propertyPath: m_Color.b
       value: 0.24528301
       objectReference: {fileID: 0}
+    - target: {fileID: 2929252283123773937, guid: aaa2c939c0359ac4dbce3f49e8b90252,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2929252285020697096, guid: aaa2c939c0359ac4dbce3f49e8b90252,
         type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -634,6 +644,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.b
       value: 0.4339623
+      objectReference: {fileID: 0}
+    - target: {fileID: 2929252283123773951, guid: aaa2c939c0359ac4dbce3f49e8b90252,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aaa2c939c0359ac4dbce3f49e8b90252, type: 3}
@@ -2408,6 +2423,8 @@ MonoBehaviour:
   valid_connection: 0
   connectionData: {fileID: 686956440}
   playerSelection: {fileID: 1143124262}
+  actualJoystick: {fileID: 2019442696}
+  actionButtonText: {fileID: 1994889525}
   errorMessage: {fileID: 2013463948}
   joystick: {fileID: 2118501558}
   action: {fileID: 1749018794}
@@ -4214,6 +4231,12 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2013463946}
   m_CullTransparentMesh: 0
+--- !u!1 &2019442696 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2929252283123773939, guid: aaa2c939c0359ac4dbce3f49e8b90252,
+    type: 3}
+  m_PrefabInstance: {fileID: 157843161}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2038905860
 GameObject:
   m_ObjectHideFlags: 0
@@ -4295,7 +4318,7 @@ MonoBehaviour:
     type: 3}
   m_PrefabInstance: {fileID: 157843161}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2019442696}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45977bbae16431c46a013576a1aea384, type: 3}
