@@ -59,14 +59,10 @@ public class PlayerLogic : MonoBehaviour
   {
     timeOnActionClick = Time.time;
 
-    //if (!actionCoolDown)
     if (!actionCoolDown)
     {
-      Debug.Log("sending message button pressed");
-      message += "{B(1)}";
+      actionButtonPressed = true;
     }
-   // else
-      //actionButtonPressed = false;
 
     actionCoolDown = true;
   }
@@ -177,10 +173,21 @@ public class PlayerLogic : MonoBehaviour
             action.image.color = Color.green;
           }
           else
+          {
+            //Debug.Log("sending message button pressed");
+            //message += "{B(1)}";
             action.image.color = Color.red;
+          }
         }
         else
           action.enabled = true;
+
+        if (actionButtonPressed)
+        {
+          Debug.Log("sending message button pressed");
+          message += "{B(1)}";
+          actionButtonPressed = false;
+        }
 
         // only send message if not empty
         if (message.Length > 0 && valid_connection)
@@ -193,12 +200,11 @@ public class PlayerLogic : MonoBehaviour
             roleNumber = "2";
 
           message += "{R(" + roleNumber + ")}";
+        }
 
-          /*
-           * TODO: Add fire button (pay attention to reload and fire button)
-           *       Add TCP or similar like channel for communicating backwards
-           *       maybe button requires TCP for higher percision
-           */
+        if (message.Length > 0)
+        {
+          Debug.Log("{" + localIP + "}" + message);
 
           // send final message
           Send("{" + localIP + "}" + message);
