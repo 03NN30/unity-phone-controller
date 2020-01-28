@@ -1898,8 +1898,8 @@ MonoBehaviour:
   selectedPort: 0
   portOut: 5555
   portIn: 5556
-  domeIP: 141.54.159.119
-  weIP: 192.168.2.100
+  domeIP: 192.168.17.218
+  weIP: 192.168.2.104
   smIP: 192.168.178.37
 --- !u!4 &686956442
 Transform:

@@ -170,13 +170,17 @@ public class PlayerLogic : MonoBehaviour
           if (Time.time - timeOnActionClick > period)
           {
             actionCoolDown = false;
-            action.image.color = Color.green;
+            action.image.color = Color.green / 2f;
           }
           else
           {
+            action.image.color = Color.red / 2f;
+          }
+          
+          if (Time.time - timeOnActionClick < period / 2f)
+          {
             //Debug.Log("sending message button pressed");
-            //message += "{B(1)}";
-            action.image.color = Color.red;
+            message += "{B(1)}";
           }
         }
         else
@@ -184,8 +188,8 @@ public class PlayerLogic : MonoBehaviour
 
         if (actionButtonPressed)
         {
-          Debug.Log("sending message button pressed");
-          message += "{B(1)}";
+          //Debug.Log("sending message button pressed");
+          //message += "{B(1)}";
           actionButtonPressed = false;
         }
 

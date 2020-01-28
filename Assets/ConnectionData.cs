@@ -17,7 +17,7 @@ public class ConnectionData : MonoBehaviour
   void Start()
   {
     // set default values
-    domeIP = "141.54.159.119";
+    domeIP = "192.168.17.218";
     weIP = "192.168.2.104";
     smIP = "192.168.178.37";
     selectedPort = portOut;
