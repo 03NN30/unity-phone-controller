@@ -26,6 +26,8 @@ public class PlayerLogic : MonoBehaviour
 
   [SerializeField]
   Text errorMessage;
+  [SerializeField]
+  Text messageSent;
 
   [SerializeField]
   Joystick joystick;
@@ -209,10 +211,13 @@ public class PlayerLogic : MonoBehaviour
         if (message.Length > 0)
         {
           Debug.Log("{" + localIP + "}" + message);
+          messageSent.text = message;
 
           // send final message
           Send("{" + localIP + "}" + message);
         }
+        else
+          messageSent.text = "";
       }
     }
   }
