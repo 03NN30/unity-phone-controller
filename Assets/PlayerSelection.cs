@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Globalization;
 
 public class PlayerSelection : MonoBehaviour
 {
@@ -15,9 +16,11 @@ public class PlayerSelection : MonoBehaviour
   public UdpClient client;
 
   [SerializeField]
-  Button confirmCommander;
+  Button confirmOppsCommander;
   [SerializeField]
-  Button confirmOfficer;
+  Button confirmWeaponsOfficer;
+  [SerializeField]
+  Button confirmCaptain;
 
   [SerializeField]
   int portIn;
@@ -35,15 +38,17 @@ public class PlayerSelection : MonoBehaviour
   [HideInInspector]
   public string receivedMessage;
 
-  private bool commanderAvailable;
-  private bool officerAvailable;
+  private bool oppsCommanderAvailable;
+  private bool weaponsOfficerAvailable;
+  private bool captainAvailable;
 
   bool active = false;
 
   private void OnEnable()
   {
-    confirmCommander.onClick.AddListener(CommanderPressed);
-    confirmOfficer.onClick.AddListener(OfficerPressed);
+    confirmOppsCommander.onClick.AddListener(CommanderPressed);
+    confirmWeaponsOfficer.onClick.AddListener(OfficerPressed);
+    confirmCaptain.onClick.AddListener(CaptainPressed);
   }
 
   public void hide()
@@ -62,34 +67,54 @@ public class PlayerSelection : MonoBehaviour
 
   private void CommanderPressed()
   {
-    if (commanderAvailable)
+    Debug.Log("Opps Commander Pressed");
+
+    if (oppsCommanderAvailable)
     {
       hide();
       gameScreen.GetComponent<PlayerLogic>().show();
-      gameScreen.GetComponent<PlayerLogic>().role = "Commander";
-      
+      gameScreen.GetComponent<PlayerLogic>().role = "OppsCommander";
+
       // once received it will send a confirmation message back
-      Send("{" + GetLocalIPAddress() + "}{R(C)}");
+      Send("{" + GetLocalIPAddress() + "}{R(OC)}");
     }
   }
 
   private void OfficerPressed()
   {
-    if (officerAvailable)
+    Debug.Log("Weapons Officer Pressed");
+
+    if (weaponsOfficerAvailable)
     {
       hide();
       gameScreen.GetComponent<PlayerLogic>().show();
-      gameScreen.GetComponent<PlayerLogic>().role = "Officer";
-      
+      gameScreen.GetComponent<PlayerLogic>().role = "WeaponsOfficer";
+
       // once received it will send a confirmation message back
-      Send("{" + GetLocalIPAddress() + "}{R(O)}");
+      Send("{" + GetLocalIPAddress() + "}{R(WO)}");
+    }
+  }
+
+  private void CaptainPressed()
+  {
+    Debug.Log("Captain pressed");
+
+    if (captainAvailable)
+    {
+      hide();
+      gameScreen.GetComponent<PlayerLogic>().show();
+      gameScreen.GetComponent<PlayerLogic>().role = "Captain";
+
+      // once received it will send a confirmation message back
+      Send("{" + GetLocalIPAddress() + "}{R(CPT)}");
     }
   }
 
   void Start()
   {
-    commanderAvailable = false;
-    officerAvailable = false;
+    oppsCommanderAvailable = false;
+    weaponsOfficerAvailable = false;
+    captainAvailable = false;
 
     // start listening at port
     receivedMessage = "";
@@ -153,36 +178,47 @@ public class PlayerSelection : MonoBehaviour
         Send("{" + GetLocalIPAddress() + "}{R(?)}");
       }
 
-      if (receivedMessage == "{R(O:0)(C:0)}")
+      int woPos = receivedMessage.IndexOf("WO:");
+      if (woPos != -1)
       {
-        officerAvailable = false;
-        commanderAvailable = false;
-      }
-      else if (receivedMessage == "{R(O:0)(C:1)}")
-      {
-        officerAvailable = false;
-        commanderAvailable = true;
-      }
-      else if (receivedMessage == "{R(O:1)(C:0)}")
-      {
-        officerAvailable = true;
-        commanderAvailable = false;
-      }
-      else if (receivedMessage == "{R(O:1)(C:1)}")
-      {
-        officerAvailable = true;
-        commanderAvailable = true;
+        string temp = receivedMessage.Substring(woPos + 3);
+        temp = temp.Substring(0, temp.IndexOf(")"));
+
+        weaponsOfficerAvailable = temp.Equals("1");
       }
 
-      if (!officerAvailable)
-        confirmOfficer.image.color = Color.grey;
-      else
-        confirmOfficer.image.color = Color.white;
+      int ocPos = receivedMessage.IndexOf("OC:");
+      if (ocPos != -1)
+      {
+        string temp = receivedMessage.Substring(ocPos + 3);
+        temp = temp.Substring(0, temp.IndexOf(")"));
 
-      if (!commanderAvailable)
-        confirmCommander.image.color = Color.grey;
+        oppsCommanderAvailable = temp.Equals("1");
+      }
+
+      int cptPos = receivedMessage.IndexOf("CPT:");
+      if (cptPos != -1)
+      {
+        string temp = receivedMessage.Substring(cptPos + 4);
+        temp = temp.Substring(0, temp.IndexOf(")"));
+
+        captainAvailable = temp.Equals("1");
+      }
+
+      if (!weaponsOfficerAvailable)
+        confirmWeaponsOfficer.image.color = Color.grey;
       else
-        confirmCommander.image.color = Color.white;
+        confirmWeaponsOfficer.image.color = Color.white;
+
+      if (!oppsCommanderAvailable)
+        confirmOppsCommander.image.color = Color.grey;
+      else
+        confirmOppsCommander.image.color = Color.white;
+
+      if (!captainAvailable)
+        confirmCaptain.image.color = Color.grey;
+      else
+        confirmCaptain.image.color = Color.white;
     }
   }
 

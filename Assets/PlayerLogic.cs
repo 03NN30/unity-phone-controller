@@ -18,7 +18,11 @@ public class PlayerLogic : MonoBehaviour
   [SerializeField]
   GameObject connectionData;
   [SerializeField]
+  GameObject startScreen;
+  [SerializeField]
   GameObject playerSelection;
+  [SerializeField]
+  GameObject actualActionObject;
   [SerializeField]
   GameObject actualJoystick;
   [SerializeField]
@@ -33,6 +37,12 @@ public class PlayerLogic : MonoBehaviour
   Joystick joystick;
   [SerializeField]
   Button action;
+
+  // gyroscope
+  private Gyroscope gyro;
+  private Quaternion gyro_rotation;
+  private Quaternion prev_gyro_rotation = new Quaternion();
+  private bool gyro_enabled;
 
   bool actionButtonPressed;
   bool active = false;
@@ -51,6 +61,10 @@ public class PlayerLogic : MonoBehaviour
 
   float period = 5f;
   float timeOnActionClick = 0f;
+
+  string wo = "WeaponsOfficer";
+  string oc = "OppsCommander";
+  string cpt = "Captain";
 
   private void OnEnable()
   {
@@ -95,6 +109,20 @@ public class PlayerLogic : MonoBehaviour
     action.image.color = Color.green;
 
     accelerometer_enabled = false;
+    gyro_enabled = false;
+
+    // gyroscope
+    if (SystemInfo.supportsGyroscope)
+    {
+      gyro = Input.gyro;
+      gyro.enabled = true;
+      gyro_enabled = true;
+    }
+    else
+    {
+      Debug.LogError("Your device doesn't have an gyroscope");
+      errorMessage.text += "no gyroscope";
+    }
 
     // accelerometer
     if (SystemInfo.supportsAccelerometer)
@@ -104,8 +132,41 @@ public class PlayerLogic : MonoBehaviour
     else
     {
       Debug.LogError("Your device doesn't have an accelerometer");
-      errorMessage.text = "This device does not have an accelerometer";
+
+      if (!gyro_enabled)
+        errorMessage.text += " and accelerometer";
+      else
+        errorMessage.text += "no accelerometer";
+
     }
+  }
+
+  void AddGyroToMessage()
+  {
+    if (gyro_enabled)
+    {
+      message += "{G" + gyro.rotationRateUnbiased + "}";
+    }
+  }
+
+  void AddAccelerometerToMessage()
+  {
+    // send data for horizontal and vertical movement using the accelerometer
+    if (accelerometer_enabled)
+    {
+      Vector3 temp = Input.acceleration;
+
+      if (prev_accelerometer != temp)
+      {
+        message += "{A" + temp.ToString() + "}";
+      }
+    }
+  }
+
+  void AddJoystickToMessage()
+  {
+    actualJoystick.SetActive(true);
+    message += "{J(" + joystick.Horizontal + ", " + joystick.Vertical + ")}";
   }
 
   void Update()
@@ -119,49 +180,57 @@ public class PlayerLogic : MonoBehaviour
           currentLevel = Int32.Parse(playerSelection.GetComponent<PlayerSelection>().receivedMessage.Substring(foundLevel + 3, 1));
       }
 
-      if (role == "Officer" || role == "Commander")
+      if (role.Equals(wo) || role.Equals(oc) || role.Equals(cpt))
       {
         // delete content of last message
         message = "";
 
-        // send data for horizontal and vertical movement using the accelerometer
-        if (accelerometer_enabled)
-        {
-          Vector3 temp = Input.acceleration;
-
-          if (prev_accelerometer != temp)
-            message += "{A" + temp.ToString() + "}";
-        }
-
         if (currentLevel == 1)
         {
-          // in here also check for role ("Commander" or "Officer") to give them different UI
-
-          actualJoystick.SetActive(false);
-
-          if (role == "Commander")
+          if (role.Equals(oc))
           {
+            actualJoystick.SetActive(false);
+            actualActionObject.SetActive(true);
             actionButtonText.text = "Reload";
+            AddAccelerometerToMessage();
           }
-          else if (role == "Officer")
+          else if (role.Equals(wo))
           {
+            actualJoystick.SetActive(false);
+            actualActionObject.SetActive(true);
             actionButtonText.text = "Fire";
+            AddAccelerometerToMessage();
+          }
+          else if (role.Equals(cpt))
+          {
+            actualJoystick.SetActive(true);
+            actualActionObject.SetActive(false);
+            AddGyroToMessage();
           }
         }
         else if (currentLevel == 2)
         {
-          // in here also check for role ("Commander" or "Officer") to give them different UI
+          actualJoystick.SetActive(false);
 
-          actualJoystick.SetActive(true);
-          message += "{J(" + joystick.Horizontal + ", " + joystick.Vertical + ")}";
-
-          if (role == "Officer")
+          if (role.Equals(oc))
           {
-            actionButtonText.text = "Reload";
+            actualJoystick.SetActive(true);
+            actualActionObject.SetActive(false);
+            AddGyroToMessage();
           }
-          else if (role == "Commander")
+          else if (role.Equals(wo))
           {
+            actualJoystick.SetActive(false);
+            actualActionObject.SetActive(true);
+            actionButtonText.text = "Reload";
+            AddAccelerometerToMessage();
+          }
+          else if (role.Equals(cpt))
+          {
+            actualJoystick.SetActive(false);
+            actualActionObject.SetActive(true);
             actionButtonText.text = "Fire";
+            AddAccelerometerToMessage();
           }
         }
 
@@ -178,7 +247,7 @@ public class PlayerLogic : MonoBehaviour
           {
             action.image.color = Color.red / 2f;
           }
-          
+
           if (Time.time - timeOnActionClick < period / 2f)
           {
             //Debug.Log("sending message button pressed");
@@ -200,10 +269,12 @@ public class PlayerLogic : MonoBehaviour
         {
           string roleNumber = "-1";
           // send joystick data
-          if (role == "Commander")
+          if (role.Equals(oc))
             roleNumber = "1";
-          else if (role == "Officer")
+          else if (role.Equals(wo))
             roleNumber = "2";
+          else if (role.Equals(cpt))
+            roleNumber = "3";
 
           message += "{R(" + roleNumber + ")}";
         }

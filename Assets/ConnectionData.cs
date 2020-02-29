@@ -13,7 +13,6 @@ public class ConnectionData : MonoBehaviour
   public string weIP;
   public string smIP;
 
-
   void Start()
   {
     // set default values
