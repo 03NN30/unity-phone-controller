@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine.UI;
+using System.Collections;
 
 public class PlayerLogic : MonoBehaviour
 {
@@ -14,7 +15,13 @@ public class PlayerLogic : MonoBehaviour
 
   private string message;
   int currentLevel = 1;
+  int prevLevel = 1;
+  bool playGlitch = false;
+  float glitchLength = 3.0f;
+  float timeAtLevelChange = 0f;
 
+  [SerializeField]
+  GameObject camera;
   [SerializeField]
   GameObject connectionData;
   [SerializeField]
@@ -106,7 +113,7 @@ public class PlayerLogic : MonoBehaviour
     valid_connection = false;
     valid_input = false;
 
-    action.image.color = Color.green;
+    action.image.color = Color.green / 2f;
 
     accelerometer_enabled = false;
     gyro_enabled = false;
@@ -137,7 +144,6 @@ public class PlayerLogic : MonoBehaviour
         errorMessage.text += " and accelerometer";
       else
         errorMessage.text += "no accelerometer";
-
     }
   }
 
@@ -145,7 +151,13 @@ public class PlayerLogic : MonoBehaviour
   {
     if (gyro_enabled)
     {
-      message += "{G" + gyro.rotationRateUnbiased + "}";
+      //message += "{G" + gyro.rotationRateUnbiased + "}";
+      string x = gyro.attitude.x.ToString("G9");
+      string y = gyro.attitude.y.ToString("G9");
+      string z = gyro.attitude.z.ToString("G9");
+      string w = gyro.attitude.w.ToString("G9");
+
+      message += "{G(" + x + ", " + y + ", " + z + ", " + w + ")}";
     }
   }
 
@@ -169,6 +181,68 @@ public class PlayerLogic : MonoBehaviour
     message += "{J(" + joystick.Horizontal + ", " + joystick.Vertical + ")}";
   }
 
+  void playConstantGlitchEffect(float intensity, float scanLineJitter, float verticalJump, float horizontalShake, float colorDrift)
+  {
+    if (!playGlitch)
+    {
+      var digital = camera.GetComponent<Kino.DigitalGlitch>();
+      digital.enabled = true;
+
+      digital.intensity = intensity;
+
+      var analog = camera.GetComponent<Kino.AnalogGlitch>();
+      analog.enabled = true;
+
+      analog.scanLineJitter = scanLineJitter;
+      analog.verticalJump = verticalJump;
+      analog.horizontalShake = horizontalShake;
+      analog.colorDrift = colorDrift;
+    }
+  }
+
+  void stopGlitchEffect()
+  {
+    camera.GetComponent<Kino.DigitalGlitch>().enabled = false;
+    camera.GetComponent<Kino.AnalogGlitch>().enabled = false;
+  }
+
+  void playGlitchEffectOnLevelChange()
+  {
+    // level has changed
+    if (prevLevel != currentLevel)
+    {
+      Debug.Log("level has been changed");
+
+      var digital = camera.GetComponent<Kino.DigitalGlitch>();
+      digital.enabled = true;
+
+      digital.intensity = 0.637f;
+
+      var analog = camera.GetComponent<Kino.AnalogGlitch>();
+      analog.enabled = true;
+
+      analog.scanLineJitter = 0.545f;
+      analog.verticalJump = 0.216f;
+      analog.horizontalShake = 0f;
+      analog.colorDrift = 0.521f;
+
+      playGlitch = true;
+      prevLevel = currentLevel;
+      timeAtLevelChange = Time.time;
+    }
+
+    if (playGlitch)
+    {
+      if (Time.time - timeAtLevelChange > glitchLength)
+      {
+        stopGlitchEffect();
+
+        Debug.Log("disable glitch");
+        playGlitch = false;
+      }
+    }
+  }
+
   void Update()
   {
     if (active)
@@ -180,115 +254,171 @@ public class PlayerLogic : MonoBehaviour
           currentLevel = Int32.Parse(playerSelection.GetComponent<PlayerSelection>().receivedMessage.Substring(foundLevel + 3, 1));
       }
 
-      if (role.Equals(wo) || role.Equals(oc) || role.Equals(cpt))
+      playGlitchEffectOnLevelChange();
+
+      if (!playGlitch)
       {
-        // delete content of last message
-        message = "";
-
-        if (currentLevel == 1)
+        if ((role.Equals(wo) || role.Equals(oc) || role.Equals(cpt)))
         {
-          if (role.Equals(oc))
-          {
-            actualJoystick.SetActive(false);
-            actualActionObject.SetActive(true);
-            actionButtonText.text = "Reload";
-            AddAccelerometerToMessage();
-          }
-          else if (role.Equals(wo))
-          {
-            actualJoystick.SetActive(false);
-            actualActionObject.SetActive(true);
-            actionButtonText.text = "Fire";
-            AddAccelerometerToMessage();
-          }
-          else if (role.Equals(cpt))
-          {
-            actualJoystick.SetActive(true);
-            actualActionObject.SetActive(false);
-            AddGyroToMessage();
-          }
-        }
-        else if (currentLevel == 2)
-        {
-          actualJoystick.SetActive(false);
+          // delete content of last message
+          message = "";
 
-          if (role.Equals(oc))
-          {
-            actualJoystick.SetActive(true);
-            actualActionObject.SetActive(false);
-            AddGyroToMessage();
-          }
-          else if (role.Equals(wo))
-          {
-            actualJoystick.SetActive(false);
-            actualActionObject.SetActive(true);
-            actionButtonText.text = "Reload";
-            AddAccelerometerToMessage();
-          }
-          else if (role.Equals(cpt))
-          {
-            actualJoystick.SetActive(false);
-            actualActionObject.SetActive(true);
-            actionButtonText.text = "Fire";
-            AddAccelerometerToMessage();
-          }
-        }
+          // 1: 0f, 0f, 0f, 0f, 0f
+          // 2: 0.01f, 0.089f, 0.059f, 0.094f, 0.240f
+          // 3: 0.05f, 0.089f, 0.059f, 0.094f, 0.240f
+          // 4: 0.1f, 0.517f, 0.234f, 0.661f, 0.492f
+          // 5: 0.3f, 0.517f, 0.234f, 0.661f, 0.492f
 
-        if (actionCoolDown)
-        {
-          action.enabled = false;
-
-          if (Time.time - timeOnActionClick > period)
+          if (currentLevel == 1 || currentLevel == 4)
           {
-            actionCoolDown = false;
-            action.image.color = Color.green / 2f;
+            if (currentLevel == 1)
+              playConstantGlitchEffect(0f, 0f, 0f, 0f, 0f);
+            else if (currentLevel == 4)
+              playConstantGlitchEffect(0.1f, 0.517f, 0.234f, 0.661f, 0.492f);
+
+            if (role.Equals(oc))
+            {
+              actualJoystick.SetActive(false);
+              actualActionObject.SetActive(true);
+              actionButtonText.text = "Reload";
+              AddAccelerometerToMessage();
+            }
+            else if (role.Equals(wo))
+            {
+              actualJoystick.SetActive(false);
+              actualActionObject.SetActive(true);
+              actionButtonText.text = "Fire";
+              AddAccelerometerToMessage();
+            }
+            else if (role.Equals(cpt))
+            {
+              actualJoystick.SetActive(true);
+              actualActionObject.SetActive(false);
+              AddGyroToMessage();
+              AddJoystickToMessage();
+            }
+          }
+          else if (currentLevel == 2 || currentLevel == 5)
+          {
+            if (currentLevel == 2)
+              playConstantGlitchEffect(0.01f, 0.089f, 0.059f, 0.094f, 0.240f);
+            else if (currentLevel == 5)
+              playConstantGlitchEffect(0.3f, 0.517f, 0.234f, 0.661f, 0.492f);
+
+            actualJoystick.SetActive(false);
+
+            if (role.Equals(oc))
+            {
+              actualJoystick.SetActive(true);
+              actualActionObject.SetActive(false);
+              AddGyroToMessage();
+              AddJoystickToMessage();
+            }
+            else if (role.Equals(wo))
+            {
+              actualJoystick.SetActive(false);
+              actualActionObject.SetActive(true);
+              actionButtonText.text = "Reload";
+              AddAccelerometerToMessage();
+            }
+            else if (role.Equals(cpt))
+            {
+              actualJoystick.SetActive(false);
+              actualActionObject.SetActive(true);
+              actionButtonText.text = "Fire";
+              AddAccelerometerToMessage();
+            }
+          }
+          else if (currentLevel == 3)
+          {
+            playConstantGlitchEffect(0.05f, 0.089f, 0.059f, 0.094f, 0.240f);
+          
+            actualJoystick.SetActive(false);
+
+            if (role.Equals(oc))
+            {
+              actualJoystick.SetActive(false);
+              actualActionObject.SetActive(true);
+              actionButtonText.text = "Fire";
+              AddAccelerometerToMessage();
+            }
+            else if (role.Equals(wo))
+            {
+              actualJoystick.SetActive(true);
+              actualActionObject.SetActive(false);
+              AddGyroToMessage();
+              AddJoystickToMessage();
+            }
+            else if (role.Equals(cpt))
+            {
+              actualJoystick.SetActive(false);
+              actualActionObject.SetActive(true);
+              actionButtonText.text = "Reload";
+              AddAccelerometerToMessage();
+            }
+          }
+
+          if (actionCoolDown)
+          {
+            action.enabled = false;
+
+            if (Time.time - timeOnActionClick > period)
+            {
+              actionCoolDown = false;
+              action.image.color = Color.green / 2f;
+            }
+            else
+            {
+              action.image.color = Color.red / 2f;
+            }
+
+            if (Time.time - timeOnActionClick < period / 2f)
+            {
+              //Debug.Log("sending message button pressed");
+              message += "{B(1)}";
+            }
           }
           else
-          {
-            action.image.color = Color.red / 2f;
-          }
+            action.enabled = true;
 
-          if (Time.time - timeOnActionClick < period / 2f)
+          if (actionButtonPressed)
           {
             //Debug.Log("sending message button pressed");
-            message += "{B(1)}";
+            //message += "{B(1)}";
+            actionButtonPressed = false;
           }
+
+          // only send message if not empty
+          if (message.Length > 0 && valid_connection)
+          {
+            string roleNumber = "-1";
+            // send joystick data
+            if (role.Equals(oc))
+              roleNumber = "1";
+            else if (role.Equals(wo))
+              roleNumber = "2";
+            else if (role.Equals(cpt))
+              roleNumber = "3";
+
+            message += "{R(" + roleNumber + ")}";
+          }
+
+          if (message.Length > 0)
+          {
+            // Debug.Log("{" + localIP + "}" + message);
+            messageSent.text = message;
+
+            // send final message
+            Send("{" + localIP + "}" + message);
+          }
+          else
+            messageSent.text = "";
         }
-        else
-          action.enabled = true;
-
-        if (actionButtonPressed)
-        {
-          //Debug.Log("sending message button pressed");
-          //message += "{B(1)}";
-          actionButtonPressed = false;
-        }
-
-        // only send message if not empty
-        if (message.Length > 0 && valid_connection)
-        {
-          string roleNumber = "-1";
-          // send joystick data
-          if (role.Equals(oc))
-            roleNumber = "1";
-          else if (role.Equals(wo))
-            roleNumber = "2";
-          else if (role.Equals(cpt))
-            roleNumber = "3";
-
-          message += "{R(" + roleNumber + ")}";
-        }
-
-        if (message.Length > 0)
-        {
-          Debug.Log("{" + localIP + "}" + message);
-          messageSent.text = message;
-
-          // send final message
-          Send("{" + localIP + "}" + message);
-        }
-        else
-          messageSent.text = "";
+      }
+      else
+      {
+        actualJoystick.SetActive(false);
+        actualActionObject.SetActive(false);
       }
     }
   }

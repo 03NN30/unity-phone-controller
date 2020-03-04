@@ -4,6 +4,10 @@ using UnityEngine.UI;
 public class StartScreen : MonoBehaviour
 {
   [SerializeField]
+  Text gyroSupport;
+  [SerializeField]
+  Text accelerometerSupport;
+  [SerializeField]
   Button continueButton;
   [SerializeField]
   Dropdown dropdown;
@@ -19,6 +23,8 @@ public class StartScreen : MonoBehaviour
   [SerializeField]
   GameObject gameScreen;
 
+  bool validPhone = true;
+
   private void OnEnable()
   {
     continueButton.onClick.AddListener(ConnectPressed);
@@ -26,6 +32,9 @@ public class StartScreen : MonoBehaviour
   
   private void ConnectPressed()
   {
+    //if (!validPhone)
+    //  return;
+
     hide();
 
     ConnectionData temp = connectionData.GetComponent<ConnectionData>();
@@ -72,5 +81,23 @@ public class StartScreen : MonoBehaviour
   void Start()
   {
     Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+    if (!SystemInfo.supportsGyroscope)
+    {
+      gyroSupport.text = "No gyroscope. Please try another phone.";
+      gyroSupport.color = Color.red;
+
+      continueButton.image.color = Color.grey;
+      validPhone = false;
+    }
+
+    if (!SystemInfo.supportsAccelerometer)
+    {
+      accelerometerSupport.text = "No accelerometer. Please try another phone.";
+      accelerometerSupport.color = Color.red;
+
+      continueButton.image.color = Color.grey;
+      validPhone = false;
+    }
   }
 }
