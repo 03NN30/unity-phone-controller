@@ -45,6 +45,10 @@ public class PlayerLogic : MonoBehaviour
   Joystick joystick;
   [SerializeField]
   Button action;
+  [SerializeField]
+  Sprite redSprite;
+  [SerializeField]
+  Sprite greenSprite;
 
   // gyroscope
   private Gyroscope gyro;
@@ -114,7 +118,7 @@ public class PlayerLogic : MonoBehaviour
     valid_connection = false;
     valid_input = false;
 
-    action.image.color = Color.green / 2f;
+    actualActionObject.GetComponent<Image>().sprite = greenSprite;
 
     accelerometer_enabled = false;
     gyro_enabled = false;
@@ -305,7 +309,7 @@ public class PlayerLogic : MonoBehaviour
             }
             else if (role.Equals(cpt))
             {
-              actualJoystick.SetActive(true);
+              actualJoystick.SetActive(false);
               actualActionObject.SetActive(false);
               AddGyroToMessage();
               AddJoystickToMessage();
@@ -328,7 +332,7 @@ public class PlayerLogic : MonoBehaviour
             }
             else if (role.Equals(oc))
             {
-              actualJoystick.SetActive(true);
+              actualJoystick.SetActive(false);
               actualActionObject.SetActive(false);
               AddGyroToMessage();
               AddJoystickToMessage();
@@ -369,7 +373,7 @@ public class PlayerLogic : MonoBehaviour
             }
             else if (role.Equals(wo))
             {
-              actualJoystick.SetActive(true);
+              actualJoystick.SetActive(false);
               actualActionObject.SetActive(false);
               AddGyroToMessage();
               AddJoystickToMessage();
@@ -386,16 +390,15 @@ public class PlayerLogic : MonoBehaviour
           if (actionCoolDown)
           {
             action.enabled = false;
+            //action.interactable = false;
 
             if (Time.time - timeOnActionClick > period)
             {
               actionCoolDown = false;
-              action.image.color = Color.green / 2f;
+              actualActionObject.GetComponent<Image>().sprite = greenSprite;
             }
             else
-            {
-              action.image.color = Color.red / 2f;
-            }
+              actualActionObject.GetComponent<Image>().sprite = redSprite;
 
             if (Time.time - timeOnActionClick < period / 2f)
             {
@@ -404,7 +407,10 @@ public class PlayerLogic : MonoBehaviour
             }
           }
           else
+          {
             action.enabled = true;
+            //action.interactable = true;
+          }
 
           if (actionButtonPressed)
           {

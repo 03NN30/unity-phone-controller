@@ -2671,6 +2671,8 @@ MonoBehaviour:
   messageSent: {fileID: 1808075220}
   joystick: {fileID: 2118501558}
   action: {fileID: 1749018794}
+  redSprite: {fileID: 21300000, guid: fcf824810cbce4b41b39f8f6b9545277, type: 3}
+  greenSprite: {fileID: 21300000, guid: abef63703b54cdf4d91a06d4a7e2f348, type: 3}
   role: 
   localIP: 
 --- !u!1 &1101374553
@@ -4294,14 +4296,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4339623, g: 0.4339623, b: 0.4339623, a: 1}
+  m_Color: {r: 0.4056604, g: 0.4056604, b: 0.4056604, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 84487d73ca4b791498332d8f6858417f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: abef63703b54cdf4d91a06d4a7e2f348, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
