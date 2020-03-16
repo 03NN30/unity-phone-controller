@@ -15,6 +15,7 @@ public class PlayerLogic : MonoBehaviour
 
   private string message;
   int currentLevel = 1;
+  bool inCave = false;
   int prevLevel = 1;
   bool playGlitch = false;
   float glitchLength = 3.0f;
@@ -252,6 +253,12 @@ public class PlayerLogic : MonoBehaviour
         int foundLevel = playerSelection.GetComponent<PlayerSelection>().receivedMessage.IndexOf("{L(");
         if (foundLevel != -1)
           currentLevel = Int32.Parse(playerSelection.GetComponent<PlayerSelection>().receivedMessage.Substring(foundLevel + 3, 1));
+
+        int foundInCave = playerSelection.GetComponent<PlayerSelection>().receivedMessage.IndexOf("{C(");
+        if (foundInCave != -1)
+          inCave = true;
+        else
+          inCave = false;
       }
 
       playGlitchEffectOnLevelChange();
@@ -276,7 +283,13 @@ public class PlayerLogic : MonoBehaviour
             else if (currentLevel == 4)
               playConstantGlitchEffect(0.1f, 0.517f, 0.234f, 0.661f, 0.492f);
 
-            if (role.Equals(oc))
+            if (inCave)
+            {
+              actualJoystick.SetActive(false);
+              actualActionObject.SetActive(false);
+              AddGyroToMessage();
+            }
+            else if (role.Equals(oc))
             {
               actualJoystick.SetActive(false);
               actualActionObject.SetActive(true);
@@ -307,7 +320,13 @@ public class PlayerLogic : MonoBehaviour
 
             actualJoystick.SetActive(false);
 
-            if (role.Equals(oc))
+            if (inCave)
+            {
+              actualJoystick.SetActive(false);
+              actualActionObject.SetActive(false);
+              AddGyroToMessage();
+            }
+            else if (role.Equals(oc))
             {
               actualJoystick.SetActive(true);
               actualActionObject.SetActive(false);
@@ -335,7 +354,13 @@ public class PlayerLogic : MonoBehaviour
           
             actualJoystick.SetActive(false);
 
-            if (role.Equals(oc))
+            if (inCave)
+            {
+              actualJoystick.SetActive(false);
+              actualActionObject.SetActive(false);
+              AddGyroToMessage();
+            }
+            else if (role.Equals(oc))
             {
               actualJoystick.SetActive(false);
               actualActionObject.SetActive(true);
