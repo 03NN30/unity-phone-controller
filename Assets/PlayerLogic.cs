@@ -355,6 +355,11 @@ public class PlayerLogic : MonoBehaviour
           inCave = false;
       }
 
+      if (role.Equals(wo) || role.Equals(oc))
+        initCalibrationButton.gameObject.SetActive(false);
+      else
+        initCalibrationButton.gameObject.SetActive(true);
+
       playGlitchEffectOnLevelChange();
 
       if (!playGlitch)
