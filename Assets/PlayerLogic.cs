@@ -32,8 +32,6 @@ public class PlayerLogic : MonoBehaviour
   [SerializeField]
   GameObject actualActionObject;
   [SerializeField]
-  GameObject actualJoystick;
-  [SerializeField]
   Text actionButtonText;
 
   [SerializeField]
@@ -41,8 +39,6 @@ public class PlayerLogic : MonoBehaviour
   [SerializeField]
   Text messageSent;
 
-  [SerializeField]
-  Joystick joystick;
   [SerializeField]
   Button action;
   [SerializeField]
@@ -78,9 +74,34 @@ public class PlayerLogic : MonoBehaviour
   string oc = "OppsCommander";
   string cpt = "Captain";
 
+  [SerializeField]
+  Button initCalibrationButton;
+  float timeToWaitForCalibrationStep = 1f;
+
+  [SerializeField]
+  Text phoneStraightInstructions;
+  [SerializeField]
+  Button confirmPhoneStraightButton;
+  bool confirmPhoneStraight = false;
+  float timeOnConfirmPhoneStraight = 0f;
+
+  [SerializeField]
+  Text flashlightStraightInstructions;
+  [SerializeField]
+  Button confirmFlashlightStraightButton;
+  bool confirmFlashLightStraight = false;
+  float timeOnConfirmFlashlightStraight = 0f;
+
+  [SerializeField]
+  bool printMessageOut = false;
+
   private void OnEnable()
   {
     action.onClick.AddListener(ActionPressed);
+    initCalibrationButton.onClick.AddListener(initCalibrationPressed);
+    
+    confirmPhoneStraightButton.onClick.AddListener(confirmPhoneStraightPressed);
+    confirmFlashlightStraightButton.onClick.AddListener(confirmFlashlightStraightPressed);
   }
 
   private void ActionPressed()
@@ -93,6 +114,49 @@ public class PlayerLogic : MonoBehaviour
     }
 
     actionCoolDown = true;
+  }
+
+  void setPhoneStraightUI(bool visible)
+  {
+    confirmPhoneStraightButton.gameObject.SetActive(visible);
+    phoneStraightInstructions.enabled = visible;
+  }
+
+  void setFlashlightStraightUI(bool visible)
+  {
+    confirmFlashlightStraightButton.gameObject.SetActive(visible);
+    flashlightStraightInstructions.enabled = visible;
+  }
+
+  private void initCalibrationPressed()
+  {
+    confirmPhoneStraightButton.gameObject.SetActive(!confirmPhoneStraightButton.gameObject.active);
+    phoneStraightInstructions.enabled = !phoneStraightInstructions.enabled;
+
+    setFlashlightStraightUI(false);
+  }
+
+  private void confirmPhoneStraightPressed()
+  {
+    setPhoneStraightUI(false);
+    setFlashlightStraightUI(true);
+
+    confirmPhoneStraight = true;
+    timeOnConfirmPhoneStraight = Time.time;
+  }
+
+  private void confirmFlashlightStraightPressed()
+  {
+    if (!confirmPhoneStraight)
+    {
+      setPhoneStraightUI(false);
+      setFlashlightStraightUI(false);
+
+      confirmFlashLightStraight = true;
+      timeOnConfirmFlashlightStraight = Time.time;
+
+      initCalibrationButton.image.color = Color.green;
+    }
   }
 
   public void hide()
@@ -113,7 +177,10 @@ public class PlayerLogic : MonoBehaviour
   {
     hide();
 
-    joystick = FindObjectOfType<Joystick>();
+    setPhoneStraightUI(false);
+    setFlashlightStraightUI(false);
+
+    //joystick = FindObjectOfType<Joystick>();
 
     valid_connection = false;
     valid_input = false;
@@ -154,6 +221,28 @@ public class PlayerLogic : MonoBehaviour
 
   void AddGyroToMessage()
   {
+    if (confirmPhoneStraight)
+    {
+      //Debug.Log("ok bro");
+      if (Time.time - timeOnConfirmPhoneStraight > timeToWaitForCalibrationStep)
+      {
+        Debug.Log("Calibration: Phone straight off");
+        confirmPhoneStraight = false;
+      }
+      string message_t = "{C(P)}";
+      Send("{" + localIP + "}" + message_t + "{R(3)}");
+    }
+    else if (confirmFlashLightStraight)
+    {
+      if (Time.time - timeOnConfirmFlashlightStraight > timeToWaitForCalibrationStep)
+      {
+        Debug.Log("Calibration: Flashlight straight off");
+        confirmFlashLightStraight = false;
+      }
+      string message_t = "{C(F)}";
+      Send("{" + localIP + "}" + message_t + "{R(3)}");
+    }
+
     if (gyro_enabled)
     {
       //message += "{G" + gyro.rotationRateUnbiased + "}";
@@ -163,6 +252,8 @@ public class PlayerLogic : MonoBehaviour
       string w = gyro.attitude.w.ToString("G9");
 
       message += "{G(" + x + ", " + y + ", " + z + ", " + w + ")}";
+
+      
     }
   }
 
@@ -182,8 +273,7 @@ public class PlayerLogic : MonoBehaviour
 
   void AddJoystickToMessage()
   {
-    actualJoystick.SetActive(true);
-    message += "{J(" + joystick.Horizontal + ", " + joystick.Vertical + ")}";
+    //message += "{J(" + joystick.Horizontal + ", " + joystick.Vertical + ")}";
   }
 
   void playConstantGlitchEffect(float intensity, float scanLineJitter, float verticalJump, float horizontalShake, float colorDrift)
@@ -289,30 +379,25 @@ public class PlayerLogic : MonoBehaviour
 
             if (inCave)
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(false);
               AddGyroToMessage();
             }
             else if (role.Equals(oc))
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(true);
               actionButtonText.text = "Reload";
               AddAccelerometerToMessage();
             }
             else if (role.Equals(wo))
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(true);
               actionButtonText.text = "Fire";
               AddAccelerometerToMessage();
             }
             else if (role.Equals(cpt))
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(false);
               AddGyroToMessage();
-              AddJoystickToMessage();
             }
           }
           else if (currentLevel == 2 || currentLevel == 5)
@@ -322,31 +407,24 @@ public class PlayerLogic : MonoBehaviour
             else if (currentLevel == 5)
               playConstantGlitchEffect(0.3f, 0.517f, 0.234f, 0.661f, 0.492f);
 
-            actualJoystick.SetActive(false);
-
             if (inCave)
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(false);
               AddGyroToMessage();
             }
             else if (role.Equals(oc))
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(false);
               AddGyroToMessage();
-              AddJoystickToMessage();
             }
             else if (role.Equals(wo))
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(true);
               actionButtonText.text = "Reload";
               AddAccelerometerToMessage();
             }
             else if (role.Equals(cpt))
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(true);
               actionButtonText.text = "Fire";
               AddAccelerometerToMessage();
@@ -356,31 +434,24 @@ public class PlayerLogic : MonoBehaviour
           {
             playConstantGlitchEffect(0.05f, 0.089f, 0.059f, 0.094f, 0.240f);
           
-            actualJoystick.SetActive(false);
-
             if (inCave)
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(false);
               AddGyroToMessage();
             }
             else if (role.Equals(oc))
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(true);
               actionButtonText.text = "Fire";
               AddAccelerometerToMessage();
             }
             else if (role.Equals(wo))
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(false);
               AddGyroToMessage();
-              AddJoystickToMessage();
             }
             else if (role.Equals(cpt))
             {
-              actualJoystick.SetActive(false);
               actualActionObject.SetActive(true);
               actionButtonText.text = "Reload";
               AddAccelerometerToMessage();
@@ -447,15 +518,15 @@ public class PlayerLogic : MonoBehaviour
         }
       }
       else
-      {
-        actualJoystick.SetActive(false);
         actualActionObject.SetActive(false);
-      }
     }
   }
 
   private void Send(string message)
   {
+    if (printMessageOut)
+      Debug.Log(message);
+
     try
     {
       byte[] data = Encoding.UTF8.GetBytes(message);
