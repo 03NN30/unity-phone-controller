@@ -353,7 +353,7 @@ public class PlayerLogic : MonoBehaviour
     }
   }
 
-  bool sendVerificationMessage = false;
+  bool sendVerificationMessage = true;
   float timeTracker = 0f;
   float timeSinceVerificationInit = 0f;
   float timeToSendVerification = 2.5f;
@@ -398,7 +398,7 @@ public class PlayerLogic : MonoBehaviour
 
       if (sendVerificationMessage)
       {
-        Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{P(" + correctRoleString + ")}", false);
+        Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{P(" + correctRoleString + ")}");
 
         if (Time.time - timeSinceVerificationInit > timeToSendVerification)
         {
