@@ -45,6 +45,8 @@ public class PlayerLogic : MonoBehaviour
   Sprite redSprite;
   [SerializeField]
   Sprite greenSprite;
+  [SerializeField]
+  Button disconnectButton;
 
   // gyroscope
   private Gyroscope gyro;
@@ -76,7 +78,7 @@ public class PlayerLogic : MonoBehaviour
 
   [SerializeField]
   Button initCalibrationButton;
-  float timeToWaitForCalibrationStep = 1f;
+  float timeToWaitForCalibrationStep = 2f;
 
   [SerializeField]
   Text phoneStraightInstructions;
@@ -95,6 +97,10 @@ public class PlayerLogic : MonoBehaviour
   [SerializeField]
   bool printMessageOut = false;
 
+  bool pressedDisconnect = false;
+  float timeOnDisconnect = 0f;
+  float timeToSendDisconnectMessage = 2f;
+
   private void OnEnable()
   {
     action.onClick.AddListener(ActionPressed);
@@ -102,6 +108,15 @@ public class PlayerLogic : MonoBehaviour
     
     confirmPhoneStraightButton.onClick.AddListener(confirmPhoneStraightPressed);
     confirmFlashlightStraightButton.onClick.AddListener(confirmFlashlightStraightPressed);
+
+    disconnectButton.onClick.AddListener(ConfirmDisconnectButton);
+  }
+
+  private void ConfirmDisconnectButton()
+  {
+    pressedDisconnect = true;
+    timeOnDisconnect = Time.time;
+    hide();
   }
 
   private void ActionPressed()
@@ -338,10 +353,59 @@ public class PlayerLogic : MonoBehaviour
     }
   }
 
+  bool sendVerificationMessage = false;
+  float timeTracker = 0f;
+  float timeSinceVerificationInit = 0f;
+  float timeToSendVerification = 2.5f;
+
   void Update()
   {
+    string correctRoleString = "";
+    if (role.Equals(wo))
+      correctRoleString = "2";
+    else if (role.Equals(oc))
+      correctRoleString = "1";
+    else if (role.Equals(cpt))
+      correctRoleString = "3";
+
+    if (pressedDisconnect)
+    {
+      if (Time.time - timeOnDisconnect < timeToSendDisconnectMessage)
+      {
+        if (!role.Equals(""))
+        {
+          Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{D(" + correctRoleString + ")}");
+        }
+
+      }
+      else
+      {
+        pressedDisconnect = false;
+        playerSelection.GetComponent<PlayerSelection>().ResetRoles();
+        playerSelection.GetComponent<PlayerSelection>().show();
+      }
+    }
+
     if (active)
     {
+      // send message every 5 seconds for 2.5 seconds to check that this client is still online
+      if (Time.time > timeTracker)
+      {
+        timeTracker += 5f;
+        sendVerificationMessage = true;
+        timeSinceVerificationInit = Time.time;
+      }
+
+      if (sendVerificationMessage)
+      {
+        Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{P(" + correctRoleString + ")}", false);
+
+        if (Time.time - timeSinceVerificationInit > timeToSendVerification)
+        {
+          sendVerificationMessage = false;
+        }
+      }
+    
       if (playerSelection.GetComponent<PlayerSelection>().receivedMessage != null || playerSelection.GetComponent<PlayerSelection>().receivedMessage != "")
       {
         int foundLevel = playerSelection.GetComponent<PlayerSelection>().receivedMessage.IndexOf("{L(");
@@ -527,10 +591,9 @@ public class PlayerLogic : MonoBehaviour
     }
   }
 
-  private void Send(string message)
+  private void Send(string message, bool printFlag = true)
   {
-    if (printMessageOut)
-      Debug.Log(message);
+    
 
     try
     {
@@ -545,5 +608,11 @@ public class PlayerLogic : MonoBehaviour
     {
       print(e.ToString());
     }
+
+    if (!printFlag)
+      return;
+
+    if (printMessageOut)
+      Debug.Log(message);
   }
 }

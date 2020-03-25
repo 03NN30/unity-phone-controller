@@ -42,6 +42,12 @@ public class PlayerSelection : MonoBehaviour
   private bool weaponsOfficerAvailable;
   private bool captainAvailable;
 
+  bool ocPressed = false;
+  bool woPressed = false;
+  bool cptPressed = false;
+  float timeOnPressed = 0f;
+  float sendRolePeriod = 2f;
+
   bool active = false;
 
   private void OnEnable()
@@ -67,8 +73,12 @@ public class PlayerSelection : MonoBehaviour
 
   private void CommanderPressed()
   {
+    ocPressed = true;
+    timeOnPressed = Time.time;
     Debug.Log("Opps Commander Pressed");
-
+    GetComponent<CanvasGroup>().alpha = 0f;
+    GetComponent<CanvasGroup>().blocksRaycasts = false;
+    /*
     if (oppsCommanderAvailable)
     {
       hide();
@@ -78,12 +88,17 @@ public class PlayerSelection : MonoBehaviour
       // once received it will send a confirmation message back
       Send("{" + GetLocalIPAddress() + "}{R(OC)}");
     }
+    */
   }
 
   private void OfficerPressed()
   {
+    woPressed = true;
+    timeOnPressed = Time.time;
     Debug.Log("Weapons Officer Pressed");
-
+    GetComponent<CanvasGroup>().alpha = 0f;
+    GetComponent<CanvasGroup>().blocksRaycasts = false;
+    /*
     if (weaponsOfficerAvailable)
     {
       hide();
@@ -93,12 +108,17 @@ public class PlayerSelection : MonoBehaviour
       // once received it will send a confirmation message back
       Send("{" + GetLocalIPAddress() + "}{R(WO)}");
     }
+    */
   }
 
   private void CaptainPressed()
   {
+    cptPressed = true;
+    timeOnPressed = Time.time;
     Debug.Log("Captain pressed");
-
+    GetComponent<CanvasGroup>().alpha = 0f;
+    GetComponent<CanvasGroup>().blocksRaycasts = false;
+    /*
     if (captainAvailable)
     {
       hide();
@@ -108,13 +128,19 @@ public class PlayerSelection : MonoBehaviour
       // once received it will send a confirmation message back
       Send("{" + GetLocalIPAddress() + "}{R(CPT)}");
     }
+    */
   }
 
-  void Start()
+  public void ResetRoles()
   {
     oppsCommanderAvailable = false;
     weaponsOfficerAvailable = false;
     captainAvailable = false;
+  }
+
+  void Start()
+  {
+    ResetRoles();
 
     // start listening at port
     receivedMessage = "";
@@ -219,13 +245,58 @@ public class PlayerSelection : MonoBehaviour
         confirmCaptain.image.color = Color.grey;
       else
         confirmCaptain.image.color = Color.white;
+
+      if (ocPressed)
+      {
+        if (Time.time - timeOnPressed < sendRolePeriod)
+        {
+          Send("{" + GetLocalIPAddress() + "}{R(OC)}");
+        }
+        else
+        {
+          ocPressed = false;
+          hide();
+          gameScreen.GetComponent<PlayerLogic>().show();
+          gameScreen.GetComponent<PlayerLogic>().role = "OppsCommander";
+        }
+      }
+      else if (woPressed)
+      {
+        if (Time.time - timeOnPressed < sendRolePeriod)
+        {
+          Send("{" + GetLocalIPAddress() + "}{R(WO)}");
+        }
+        else
+        {
+          woPressed = false;
+          hide();
+          gameScreen.GetComponent<PlayerLogic>().show();
+          gameScreen.GetComponent<PlayerLogic>().role = "WeaponsOfficer";
+        }
+      }
+      else if (cptPressed)
+      {
+        if (Time.time - timeOnPressed < sendRolePeriod)
+        {
+          Send("{" + GetLocalIPAddress() + "}{R(CPT)}");
+        }
+        else
+        {
+          cptPressed = false;
+          hide();
+          gameScreen.GetComponent<PlayerLogic>().show();
+          gameScreen.GetComponent<PlayerLogic>().role = "Captain";
+        }
+      }
     }
   }
+
 
   private void Send(string message)
   {
     if (printMessageOut)
       Debug.Log(message);
+
     try
     {
       byte[] data = Encoding.UTF8.GetBytes(message);
