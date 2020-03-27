@@ -179,6 +179,8 @@ public class PlayerLogic : MonoBehaviour
     active = false;
     GetComponent<CanvasGroup>().alpha = 0f;
     GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+    stopGlitchEffect();
   }
 
   public void show()
@@ -439,12 +441,36 @@ public class PlayerLogic : MonoBehaviour
           // 4: 0.1f, 0.517f, 0.234f, 0.661f, 0.492f
           // 5: 0.3f, 0.517f, 0.234f, 0.661f, 0.492f
 
-          if (currentLevel == 1 || currentLevel == 4)
+          if (currentLevel == 1)
           {
-            if (currentLevel == 1)
-              playConstantGlitchEffect(0f, 0f, 0f, 0f, 0f);
-            else if (currentLevel == 4)
-              playConstantGlitchEffect(0.1f, 0.517f, 0.234f, 0.661f, 0.492f);
+            playConstantGlitchEffect(0f, 0f, 0f, 0f, 0f);
+            
+            if (inCave)
+            {
+              actualActionObject.SetActive(false);
+              AddGyroToMessage();
+            }
+            else if (role.Equals(oc))
+            {
+              actualActionObject.SetActive(false);
+              actionButtonText.text = "Reload";
+              AddAccelerometerToMessage();
+            }
+            else if (role.Equals(wo))
+            {
+              actualActionObject.SetActive(false);
+              actionButtonText.text = "Fire";
+              AddAccelerometerToMessage();
+            }
+            else if (role.Equals(cpt))
+            {
+              actualActionObject.SetActive(false);
+              AddGyroToMessage();
+            }
+          }
+          else if (currentLevel == 4)
+          { 
+            playConstantGlitchEffect(0.1f, 0.517f, 0.234f, 0.661f, 0.492f);
 
             if (inCave)
             {
