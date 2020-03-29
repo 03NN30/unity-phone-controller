@@ -269,8 +269,6 @@ public class PlayerLogic : MonoBehaviour
       string w = gyro.attitude.w.ToString("G9");
 
       message += "{G(" + x + ", " + y + ", " + z + ", " + w + ")}";
-
-      
     }
   }
 
@@ -421,11 +419,6 @@ public class PlayerLogic : MonoBehaviour
           inCave = false;
       }
 
-      if (role.Equals(wo) || role.Equals(oc))
-        initCalibrationButton.gameObject.SetActive(false);
-      else
-        initCalibrationButton.gameObject.SetActive(true);
-
       playGlitchEffectOnLevelChange();
 
       if (!playGlitch)
@@ -445,10 +438,16 @@ public class PlayerLogic : MonoBehaviour
           {
             playConstantGlitchEffect(0f, 0f, 0f, 0f, 0f);
             
+            if (!inCave && !role.Equals(cpt))
+            {
+              initCalibrationButton.gameObject.SetActive(false);
+            }
+
             if (inCave)
             {
               actualActionObject.SetActive(false);
               AddGyroToMessage();
+              initCalibrationButton.gameObject.SetActive(true);
             }
             else if (role.Equals(oc))
             {
@@ -472,10 +471,16 @@ public class PlayerLogic : MonoBehaviour
           { 
             playConstantGlitchEffect(0.1f, 0.517f, 0.234f, 0.661f, 0.492f);
 
+            if (!inCave && !role.Equals(cpt))
+            {
+              initCalibrationButton.gameObject.SetActive(false);
+            }
+
             if (inCave)
             {
               actualActionObject.SetActive(false);
               AddGyroToMessage();
+              initCalibrationButton.gameObject.SetActive(true);
             }
             else if (role.Equals(oc))
             {
@@ -502,10 +507,16 @@ public class PlayerLogic : MonoBehaviour
             else if (currentLevel == 5)
               playConstantGlitchEffect(0.3f, 0.517f, 0.234f, 0.661f, 0.492f);
 
+            if (!inCave && !role.Equals(cpt))
+            {
+              initCalibrationButton.gameObject.SetActive(false);
+            }
+
             if (inCave)
             {
               actualActionObject.SetActive(false);
               AddGyroToMessage();
+              initCalibrationButton.gameObject.SetActive(true);
             }
             else if (role.Equals(oc))
             {
@@ -528,11 +539,17 @@ public class PlayerLogic : MonoBehaviour
           else if (currentLevel == 3)
           {
             playConstantGlitchEffect(0.05f, 0.089f, 0.059f, 0.094f, 0.240f);
-          
+
+            if (!inCave && !role.Equals(cpt))
+            {
+              initCalibrationButton.gameObject.SetActive(false);
+            }
+
             if (inCave)
             {
               actualActionObject.SetActive(false);
               AddGyroToMessage();
+              initCalibrationButton.gameObject.SetActive(true);
             }
             else if (role.Equals(oc))
             {
