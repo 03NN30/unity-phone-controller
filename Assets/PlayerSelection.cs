@@ -14,6 +14,8 @@ public class PlayerSelection : MonoBehaviour
   public IPEndPoint remoteEndPoint;
   [HideInInspector]
   public UdpClient client;
+  [SerializeField]
+  GameObject startScreen;
 
   [SerializeField]
   Button confirmOppsCommander;
@@ -21,6 +23,8 @@ public class PlayerSelection : MonoBehaviour
   Button confirmWeaponsOfficer;
   [SerializeField]
   Button confirmCaptain;
+  [SerializeField]
+  Button backButton;
 
   [SerializeField]
   int portIn;
@@ -55,6 +59,13 @@ public class PlayerSelection : MonoBehaviour
     confirmOppsCommander.onClick.AddListener(CommanderPressed);
     confirmWeaponsOfficer.onClick.AddListener(OfficerPressed);
     confirmCaptain.onClick.AddListener(CaptainPressed);
+    backButton.onClick.AddListener(BackPressed);
+  }
+
+  void BackPressed()
+  {
+    hide();
+    startScreen.GetComponent<StartScreen>().show();
   }
 
   public void hide()

@@ -12,6 +12,8 @@ public class ManualConfiguration : MonoBehaviour
 
   [SerializeField]
   Button connect;
+  [SerializeField]
+  Button backButton;
 
   [SerializeField]
   GameObject connectionData;
@@ -19,6 +21,8 @@ public class ManualConfiguration : MonoBehaviour
   GameObject playerSelection;
   [SerializeField]
   GameObject gameScreen;
+  [SerializeField]
+  GameObject startScreen;
 
   public void hide()
   {
@@ -35,6 +39,13 @@ public class ManualConfiguration : MonoBehaviour
   private void OnEnable()
   {
     connect.onClick.AddListener(ConnectPressed);
+    backButton.onClick.AddListener(BackPressed);
+  }
+
+  void BackPressed()
+  {
+    hide();
+    startScreen.GetComponent<StartScreen>().show();
   }
 
   private void ConnectPressed()

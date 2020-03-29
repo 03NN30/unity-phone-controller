@@ -36,8 +36,6 @@ public class PlayerLogic : MonoBehaviour
 
   [SerializeField]
   Text errorMessage;
-  [SerializeField]
-  Text messageSent;
 
   [SerializeField]
   Button action;
@@ -47,6 +45,25 @@ public class PlayerLogic : MonoBehaviour
   Sprite greenSprite;
   [SerializeField]
   Button disconnectButton;
+
+  [SerializeField]
+  Text gyroText;
+  [SerializeField]
+  Text accelText;
+  [SerializeField]
+  Text buttonText;
+  [SerializeField]
+  Text disconnectText;
+  [SerializeField]
+  Text presentText;
+  [SerializeField]
+  Text roleAskText;
+  [SerializeField]
+  Text roleSendText;
+  [SerializeField]
+  Text calib1Text;
+  [SerializeField]
+  Text calib2Text;
 
   // gyroscope
   private Gyroscope gyro;
@@ -404,6 +421,12 @@ public class PlayerLogic : MonoBehaviour
         {
           sendVerificationMessage = false;
         }
+
+        presentText.text = "P(1) ";
+      }
+      else
+      {
+        presentText.text = "P(0) ";
       }
     
       if (playerSelection.GetComponent<PlayerSelection>().receivedMessage != null || playerSelection.GetComponent<PlayerSelection>().receivedMessage != "")
@@ -619,14 +642,45 @@ public class PlayerLogic : MonoBehaviour
 
           if (message.Length > 0)
           {
-            // Debug.Log("{" + localIP + "}" + message);
-            messageSent.text = message;
+            if (message.IndexOf("{G(") != -1)
+              gyroText.text = "G(1) ";
+            else
+              gyroText.text = "G(0) ";
+
+            if (message.IndexOf("{A(") != -1)
+              accelText.text = "A(1) ";
+            else
+              accelText.text = "A(0) ";
+
+            if (message.IndexOf("{B(") != -1)
+              buttonText.text = "B(1) ";
+            else
+              buttonText.text = "B(0) ";
+
+            if (message.IndexOf("{D(") != -1)
+              disconnectText.text = "D(1) ";
+            else
+              disconnectText.text = "D(0) ";
+
+            if (message.IndexOf("{R(?)") != -1)
+              roleAskText.text = "R?(1) ";
+            else
+              roleAskText.text = "R?(0) ";
+
+            int rolePos = message.IndexOf("{R(");
+            if (rolePos != -1)
+            {
+              string roleData = message.Substring(rolePos + 3);
+              roleData = roleData.Substring(0, roleData.IndexOf(")") - 1);
+
+              roleSendText.text = "R(" + roleData;
+            }
+            else
+              roleSendText.text = "R(0)";
 
             // send final message
             Send("{" + localIP + "}" + message);
           }
-          else
-            messageSent.text = "";
         }
       }
       else
@@ -636,8 +690,6 @@ public class PlayerLogic : MonoBehaviour
 
   private void Send(string message, bool printFlag = true)
   {
-    
-
     try
     {
       byte[] data = Encoding.UTF8.GetBytes(message);
