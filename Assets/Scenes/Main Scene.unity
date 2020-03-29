@@ -2382,6 +2382,7 @@ MonoBehaviour:
   connectionData: {fileID: 686956440}
   playerSelection: {fileID: 1143124262}
   gameScreen: {fileID: 1058428187}
+  startScreen: {fileID: 762859814}
 --- !u!1 &674267933
 GameObject:
   m_ObjectHideFlags: 0
