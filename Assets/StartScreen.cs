@@ -23,8 +23,6 @@ public class StartScreen : MonoBehaviour
   [SerializeField]
   GameObject gameScreen;
 
-  bool validPhone = true;
-
   private void OnEnable()
   {
     continueButton.onClick.AddListener(ConnectPressed);
@@ -32,30 +30,25 @@ public class StartScreen : MonoBehaviour
   
   private void ConnectPressed()
   {
-    //if (!validPhone)
-    //  return;
-
     hide();
-
-    ConnectionData temp = connectionData.GetComponent<ConnectionData>();
 
     switch (dropdown.options[dropdown.value].text)
     {
       case "Dome":
-        Debug.Log("Continuing with Dome [" + temp.domeIP + ":5555]");
-        temp.selectedIP = temp.domeIP;
+        ConnectionData.selectedIP = ConnectionData.domeIP;
+        Debug.Log("Continuing with Dome [" + ConnectionData.selectedIP + ":5555]");
         playerSelection.GetComponent<PlayerSelection>().show();
         gameScreen.GetComponent<PlayerLogic>().valid_input = true;
         break;
       case "WE":
-        Debug.Log("Continuing with Debug (WE) [" + temp.weIP + ":5555]");
-        temp.selectedIP = temp.weIP;
+        ConnectionData.selectedIP = ConnectionData.weIP;
+        Debug.Log("Continuing with Debug (WE) [" + ConnectionData.selectedIP + ":5555]");
         playerSelection.GetComponent<PlayerSelection>().show();
         gameScreen.GetComponent<PlayerLogic>().valid_input = true;
         break;
       case "SM":
-        Debug.Log("Continuing with Debug (SM) [" + temp.smIP + ":5555]");
-        temp.selectedIP = temp.smIP;
+        ConnectionData.selectedIP = ConnectionData.smIP;
+        Debug.Log("Continuing with Debug (SM) [" + ConnectionData.selectedIP + ":5555]");
         playerSelection.GetComponent<PlayerSelection>().show();
         gameScreen.GetComponent<PlayerLogic>().valid_input = true;
         break;
@@ -88,7 +81,6 @@ public class StartScreen : MonoBehaviour
       gyroSupport.color = Color.red;
 
       continueButton.image.color = Color.grey;
-      validPhone = false;
     }
 
     if (!SystemInfo.supportsAccelerometer)
@@ -97,7 +89,6 @@ public class StartScreen : MonoBehaviour
       accelerometerSupport.color = Color.red;
 
       continueButton.image.color = Color.grey;
-      validPhone = false;
     }
   }
 }

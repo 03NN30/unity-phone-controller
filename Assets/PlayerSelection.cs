@@ -5,17 +5,15 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Globalization;
 
 public class PlayerSelection : MonoBehaviour
 {
   // sending
   [HideInInspector]
-  public TCPClient tcpClient;
+  public static TCPClient tcpClient;
   [HideInInspector]
-  public IPEndPoint remoteEndPoint;
-  [HideInInspector]
-  public UdpClient client;
+  public static UDPClient udpClient;
+
   [SerializeField]
   GameObject startScreen;
 
@@ -29,24 +27,11 @@ public class PlayerSelection : MonoBehaviour
   Button backButton;
 
   [SerializeField]
-  int portIn;
-  [SerializeField]
-  GameObject connectionData;
-  [SerializeField]
   GameObject gameScreen;
 
-  [SerializeField]
-  bool printMessageIn;
-  [SerializeField]
-  bool printMessageOut;
-
-  // receiving
-  [HideInInspector]
-  public string receivedMessage;
-
-  private bool oppsCommanderAvailable;
-  private bool weaponsOfficerAvailable;
-  private bool captainAvailable;
+  public static bool oppsCommanderAvailable;
+  public static bool weaponsOfficerAvailable;
+  public static bool captainAvailable;
 
   bool ocPressed = false;
   bool woPressed = false;
@@ -123,44 +108,20 @@ public class PlayerSelection : MonoBehaviour
 
   void initTCP()
   {
-    var temp = connectionData.GetComponent<ConnectionData>();
-    tcpClient = new TCPClient(temp.selectedIP, temp.selectedPortTCP);
-
+    tcpClient = new TCPClient(ConnectionData.selectedIP, ConnectionData.portOutTCP);
     tcpClient.Initiate();
+  }
+
+  void initUDP()
+  {
+    udpClient = new UDPClient();
+    udpClient.Initiate(ConnectionData.selectedIP, ConnectionData.portOutUDP);
+    udpClient.Listen();
   }
 
   void Start()
   {
     ResetRoles();
-
-    // start listening at port
-    receivedMessage = "";
-
-    Thread receiveThread = new Thread(new ThreadStart(() =>
-    {
-      UdpClient self = new UdpClient(portIn);
-      while (true)
-      {
-        try
-        {
-          IPEndPoint ip = new IPEndPoint(IPAddress.Any, 0);
-          byte[] data = self.Receive(ref ip);
-
-          receivedMessage = Encoding.UTF8.GetString(data);
-
-          if (printMessageIn)
-            Debug.Log(receivedMessage);
-        }
-        catch (Exception e)
-        {
-          print(e.ToString());
-        }
-      }
-    }))
-    {
-      IsBackground = true
-    };
-    receiveThread.Start();
 
     hide();
   }
@@ -174,14 +135,9 @@ public class PlayerSelection : MonoBehaviour
       {
         gameScreen.GetComponent<PlayerLogic>().valid_connection = true;
 
-        remoteEndPoint = new IPEndPoint(
-          IPAddress.Parse(connectionData.GetComponent<ConnectionData>().selectedIP),
-          connectionData.GetComponent<ConnectionData>().selectedPort
-        );
+        initUDP();
 
-        client = new UdpClient();
-
-        gameScreen.GetComponent<PlayerLogic>().localIP = GetLocalIPAddress().ToString();
+        gameScreen.GetComponent<PlayerLogic>().localIP = UDPClient.GetLocalIPAddress();
 
         initTCP();
         Debug.Log("Connection Established");
@@ -193,31 +149,31 @@ public class PlayerSelection : MonoBehaviour
          * Once this message is sent, the server will answer by telling about the availability of all
          * possible player roles.
          */
-        Send("{" + GetLocalIPAddress() + "}{R(?)}");
+        udpClient.Send("{" + UDPClient.GetLocalIPAddress() + "}{R(?)}");
       }
 
-      int woPos = receivedMessage.IndexOf("WO:");
+      int woPos = udpClient.ReceivedMessage.IndexOf("WO:");
       if (woPos != -1)
       {
-        string temp = receivedMessage.Substring(woPos + 3);
+        string temp = udpClient.ReceivedMessage.Substring(woPos + 3);
         temp = temp.Substring(0, temp.IndexOf(")"));
 
         weaponsOfficerAvailable = temp.Equals("1");
       }
 
-      int ocPos = receivedMessage.IndexOf("OC:");
+      int ocPos = udpClient.ReceivedMessage.IndexOf("OC:");
       if (ocPos != -1)
       {
-        string temp = receivedMessage.Substring(ocPos + 3);
+        string temp = udpClient.ReceivedMessage.Substring(ocPos + 3);
         temp = temp.Substring(0, temp.IndexOf(")"));
 
         oppsCommanderAvailable = temp.Equals("1");
       }
 
-      int cptPos = receivedMessage.IndexOf("CPT:");
+      int cptPos = udpClient.ReceivedMessage.IndexOf("CPT:");
       if (cptPos != -1)
       {
-        string temp = receivedMessage.Substring(cptPos + 4);
+        string temp = udpClient.ReceivedMessage.Substring(cptPos + 4);
         temp = temp.Substring(0, temp.IndexOf(")"));
 
         captainAvailable = temp.Equals("1");
@@ -242,7 +198,7 @@ public class PlayerSelection : MonoBehaviour
       {
         if (Time.time - timeOnPressed < sendRolePeriod)
         {
-          Send("{" + GetLocalIPAddress() + "}{R(OC)}");
+          udpClient.Send("{" + UDPClient.GetLocalIPAddress() + "}{R(OC)}");
         }
         else
         {
@@ -256,7 +212,7 @@ public class PlayerSelection : MonoBehaviour
       {
         if (Time.time - timeOnPressed < sendRolePeriod)
         {
-          Send("{" + GetLocalIPAddress() + "}{R(WO)}");
+          udpClient.Send("{" + UDPClient.GetLocalIPAddress() + "}{R(WO)}");
         }
         else
         {
@@ -270,7 +226,7 @@ public class PlayerSelection : MonoBehaviour
       {
         if (Time.time - timeOnPressed < sendRolePeriod)
         {
-          Send("{" + GetLocalIPAddress() + "}{R(CPT)}");
+          udpClient.Send("{" + UDPClient.GetLocalIPAddress() + "}{R(CPT)}");
         }
         else
         {
@@ -281,36 +237,5 @@ public class PlayerSelection : MonoBehaviour
         }
       }
     }
-  }
-
-
-  private void Send(string message)
-  {
-    if (printMessageOut)
-      Debug.Log(message);
-
-    try
-    {
-      byte[] data = Encoding.UTF8.GetBytes(message);
-      client.Send(data, data.Length, remoteEndPoint);
-    }
-    catch (Exception e)
-    {
-      print(e.ToString());
-    }
-  }
-
-  public static string GetLocalIPAddress()
-  {
-    var host = Dns.GetHostEntry(Dns.GetHostName());
-    foreach (var ip in host.AddressList)
-    {
-      if (ip.AddressFamily == AddressFamily.InterNetwork)
-      {
-        return ip.ToString();
-      }
-    }
-
-    throw new Exception("No network adapters with an IPv4 address in the system!");
   }
 }

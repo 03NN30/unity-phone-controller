@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -17,6 +15,7 @@ public class TCPClient
 
   public TCPClient(string host, int port)
   {
+    Debug.Log("Creating TCP Client");
     Host = host;
 
     Port = port;
@@ -51,6 +50,7 @@ public class TCPClient
     }
     catch (Exception e)
     {
+      Debug.LogError(e.Message);
       return false;
     }
 
@@ -103,13 +103,26 @@ public class TCPClient
         await Task.Run(() =>
         {
           Id = p.data[0].ToString();
-          //var toDisableRoleType = (RoleType)Enum.Parse(typeof(RoleType), p.data[1].ToString());
-          // Disable that shit
+          var toDisable = (RoleType)Enum.Parse(typeof(RoleType), p.data[1].ToString());
+
+          // disable roles
+          if (toDisable == RoleType.OppsCommander)
+          {
+            PlayerSelection.oppsCommanderAvailable = false;
+          }
+          else if (toDisable == RoleType.WeaponsOfficer)
+          {
+            PlayerSelection.weaponsOfficerAvailable = false;
+          }
+          else if (toDisable == RoleType.Captain)
+          {
+            PlayerSelection.captainAvailable = false;
+          }
         });
         break;
 
       case PackageType.Disconnected:
-          // ...
+          
         break;
 
       case PackageType.ServerFull:

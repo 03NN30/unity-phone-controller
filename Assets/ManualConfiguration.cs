@@ -16,8 +16,6 @@ public class ManualConfiguration : MonoBehaviour
   Button backButton;
 
   [SerializeField]
-  GameObject connectionData;
-  [SerializeField]
   GameObject playerSelection;
   [SerializeField]
   GameObject gameScreen;
@@ -54,9 +52,7 @@ public class ManualConfiguration : MonoBehaviour
     Match match_port = Regex.Match(inPort.text, @"\b\d{1,6}\b");
     if (match_ip.Success && match_port.Success)
     {
-      ConnectionData temp = connectionData.GetComponent<ConnectionData>();
-      temp.selectedIP = inIP.text;
-      temp.selectedPort = Int32.Parse(inPort.text);
+      ConnectionData.selectedIP = inIP.text;
 
       gameScreen.GetComponent<PlayerLogic>().valid_input = true;
       connect.image.color = Color.green;

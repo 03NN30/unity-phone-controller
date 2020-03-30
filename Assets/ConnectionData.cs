@@ -3,23 +3,20 @@
 public class ConnectionData : MonoBehaviour
 {
   [HideInInspector]
-  public string selectedIP;
-  [HideInInspector]
-  public int selectedPort;
+  public static string selectedIP;
 
-  public int selectedPortTCP;
-  public int portOut;
-  public int portIn;
-  public string domeIP;
-  public string weIP;
-  public string smIP;
+  public const int portOutTCP = 11000;
+  public const int portOutUDP = 5555;
+  public const int portInUDP = 5556;
 
-  void Start()
+  public const string domeIP = "192.168.0.101";
+  public const string weIP = "192.168.2.104";
+  public const string smIP = "192.168.178.41";
+
+  public static string localIP;
+
+  private void Start()
   {
-    // set default values
-    domeIP = "192.168.0.101";
-    weIP = "192.168.2.104";
-    smIP = "192.168.178.41";
-    selectedPort = portOut;
+    localIP = UDPClient.GetLocalIPAddress();
   }
 }

@@ -8,8 +8,6 @@ using System.Collections;
 
 public class PlayerLogic : MonoBehaviour
 {
-  [SerializeField]
-  Button testButton;
   [HideInInspector]
   public bool valid_input;
   [HideInInspector]
@@ -23,6 +21,7 @@ public class PlayerLogic : MonoBehaviour
   float glitchLength = 3.0f;
   float timeAtLevelChange = 0f;
 
+  #region GameObjects
   [SerializeField]
   GameObject camera;
   [SerializeField]
@@ -33,21 +32,27 @@ public class PlayerLogic : MonoBehaviour
   GameObject playerSelection;
   [SerializeField]
   GameObject actualActionObject;
-  [SerializeField]
-  Text actionButtonText;
-
-  [SerializeField]
-  Text errorMessage;
-
-  [SerializeField]
-  Button action;
+  #endregion
+  #region Sprites
   [SerializeField]
   Sprite redSprite;
   [SerializeField]
   Sprite greenSprite;
+  #endregion
+  #region Buttons
+  [SerializeField]
+  Button testButton;
+  [SerializeField]
+  Button action;
+
   [SerializeField]
   Button disconnectButton;
-
+  #endregion
+  #region Texts
+  [SerializeField]
+  Text actionButtonText;
+  [SerializeField]
+  Text errorMessage;
   [SerializeField]
   Text gyroText;
   [SerializeField]
@@ -66,6 +71,7 @@ public class PlayerLogic : MonoBehaviour
   Text calib1Text;
   [SerializeField]
   Text calib2Text;
+  #endregion
 
   // gyroscope
   private Gyroscope gyro;
@@ -136,7 +142,7 @@ public class PlayerLogic : MonoBehaviour
   void TestButtonPressed()
   {
     Debug.Log("ZA WARUDO!!!!");
-    var tcpClient = playerSelection.GetComponent<PlayerSelection>().tcpClient;
+    var tcpClient = PlayerSelection.tcpClient;
     tcpClient.Send(PackageType.Connected, RoleType.Captain.ToString());
   }
 
@@ -225,8 +231,6 @@ public class PlayerLogic : MonoBehaviour
     setPhoneStraightUI(false);
     setFlashlightStraightUI(false);
 
-    //joystick = FindObjectOfType<Joystick>();
-
     valid_connection = false;
     valid_input = false;
 
@@ -274,7 +278,7 @@ public class PlayerLogic : MonoBehaviour
         confirmPhoneStraight = false;
       }
       string message_t = "{C(P)}";
-      Send("{" + localIP + "}" + message_t + "{R(3)}");
+      PlayerSelection.udpClient.Send("{" + localIP + "}" + message_t + "{R(3)}");
     }
     else if (confirmFlashLightStraight)
     {
@@ -284,7 +288,7 @@ public class PlayerLogic : MonoBehaviour
         confirmFlashLightStraight = false;
       }
       string message_t = "{C(F)}";
-      Send("{" + localIP + "}" + message_t + "{R(3)}");
+      PlayerSelection.udpClient.Send("{" + localIP + "}" + message_t + "{R(3)}");
     }
 
     if (gyro_enabled)
@@ -311,11 +315,6 @@ public class PlayerLogic : MonoBehaviour
         message += "{A" + temp.ToString() + "}";
       }
     }
-  }
-
-  void AddJoystickToMessage()
-  {
-    //message += "{J(" + joystick.Horizontal + ", " + joystick.Vertical + ")}";
   }
 
   void playConstantGlitchEffect(float intensity, float scanLineJitter, float verticalJump, float horizontalShake, float colorDrift)
@@ -401,7 +400,7 @@ public class PlayerLogic : MonoBehaviour
       {
         if (!role.Equals(""))
         {
-          Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{D(" + correctRoleString + ")}");
+          PlayerSelection.udpClient.Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{D(" + correctRoleString + ")}");
         }
 
       }
@@ -415,6 +414,9 @@ public class PlayerLogic : MonoBehaviour
 
     if (active)
     {
+      if (PlayerSelection.udpClient == null)
+        Debug.LogError("Next you say \"it's null\"");
+
       // send message every 5 seconds for 2.5 seconds to check that this client is still online
       if (Time.time > timeTracker)
       {
@@ -425,7 +427,7 @@ public class PlayerLogic : MonoBehaviour
 
       if (sendVerificationMessage)
       {
-        Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{P(" + correctRoleString + ")}");
+        PlayerSelection.udpClient.Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{P(" + correctRoleString + ")}");
 
         if (Time.time - timeSinceVerificationInit > timeToSendVerification)
         {
@@ -439,13 +441,13 @@ public class PlayerLogic : MonoBehaviour
         presentText.text = "P(0) ";
       }
     
-      if (playerSelection.GetComponent<PlayerSelection>().receivedMessage != null || playerSelection.GetComponent<PlayerSelection>().receivedMessage != "")
+      if (PlayerSelection.udpClient.ReceivedMessage != null || PlayerSelection.udpClient.ReceivedMessage != "")
       {
-        int foundLevel = playerSelection.GetComponent<PlayerSelection>().receivedMessage.IndexOf("{L(");
+        int foundLevel = PlayerSelection.udpClient.ReceivedMessage.IndexOf("{L(");
         if (foundLevel != -1)
-          currentLevel = Int32.Parse(playerSelection.GetComponent<PlayerSelection>().receivedMessage.Substring(foundLevel + 3, 1));
+          currentLevel = Int32.Parse(PlayerSelection.udpClient.ReceivedMessage.Substring(foundLevel + 3, 1));
 
-        int foundInCave = playerSelection.GetComponent<PlayerSelection>().receivedMessage.IndexOf("{C(");
+        int foundInCave = PlayerSelection.udpClient.ReceivedMessage.IndexOf("{C(");
         if (foundInCave != -1)
           inCave = true;
         else
@@ -689,35 +691,12 @@ public class PlayerLogic : MonoBehaviour
               roleSendText.text = "R(0)";
 
             // send final message
-            Send("{" + localIP + "}" + message);
+            PlayerSelection.udpClient.Send("{" + localIP + "}" + message);
           }
         }
       }
       else
         actualActionObject.SetActive(false);
     }
-  }
-
-  private void Send(string message, bool printFlag = true)
-  {
-    try
-    {
-      byte[] data = Encoding.UTF8.GetBytes(message);
-      playerSelection.GetComponent<PlayerSelection>().client.Send(
-        data,
-        data.Length,
-        playerSelection.GetComponent<PlayerSelection>().remoteEndPoint
-        );
-    }
-    catch (Exception e)
-    {
-      print(e.ToString());
-    }
-
-    if (!printFlag)
-      return;
-
-    if (printMessageOut)
-      Debug.Log(message);
   }
 }
