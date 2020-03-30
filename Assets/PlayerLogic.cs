@@ -86,10 +86,6 @@ public class PlayerLogic : MonoBehaviour
   [HideInInspector]
   public string role;
 
-  // use own local IP address to identify player
-  [HideInInspector]
-  public string localIP;
-
   // accelerometer
   private bool accelerometer_enabled;
   private Vector3 prev_accelerometer = new Vector3();
@@ -142,7 +138,7 @@ public class PlayerLogic : MonoBehaviour
   void TestButtonPressed()
   {
     Debug.Log("ZA WARUDO!!!!");
-    var tcpClient = PlayerSelection.tcpClient;
+    var tcpClient = StartScreen.tcpClient;
     tcpClient.Send(PackageType.Connected, RoleType.Captain.ToString());
   }
 
@@ -278,7 +274,7 @@ public class PlayerLogic : MonoBehaviour
         confirmPhoneStraight = false;
       }
       string message_t = "{C(P)}";
-      PlayerSelection.udpClient.Send("{" + localIP + "}" + message_t + "{R(3)}");
+      PlayerSelection.udpClient.Send("{" + ConnectionData.localIP + "}" + message_t + "{R(3)}");
     }
     else if (confirmFlashLightStraight)
     {
@@ -288,7 +284,7 @@ public class PlayerLogic : MonoBehaviour
         confirmFlashLightStraight = false;
       }
       string message_t = "{C(F)}";
-      PlayerSelection.udpClient.Send("{" + localIP + "}" + message_t + "{R(3)}");
+      PlayerSelection.udpClient.Send("{" + ConnectionData.localIP + "}" + message_t + "{R(3)}");
     }
 
     if (gyro_enabled)
@@ -400,7 +396,7 @@ public class PlayerLogic : MonoBehaviour
       {
         if (!role.Equals(""))
         {
-          PlayerSelection.udpClient.Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{D(" + correctRoleString + ")}");
+          PlayerSelection.udpClient.Send("{" + ConnectionData.localIP + "}" + "{R(" + correctRoleString + ")}{D(" + correctRoleString + ")}");
         }
 
       }
@@ -427,7 +423,7 @@ public class PlayerLogic : MonoBehaviour
 
       if (sendVerificationMessage)
       {
-        PlayerSelection.udpClient.Send("{" + localIP + "}" + "{R(" + correctRoleString + ")}{P(" + correctRoleString + ")}");
+        PlayerSelection.udpClient.Send("{" + ConnectionData.localIP + "}" + "{R(" + correctRoleString + ")}{P(" + correctRoleString + ")}");
 
         if (Time.time - timeSinceVerificationInit > timeToSendVerification)
         {
@@ -608,7 +604,6 @@ public class PlayerLogic : MonoBehaviour
           if (actionCoolDown)
           {
             action.enabled = false;
-            //action.interactable = false;
 
             if (Time.time - timeOnActionClick > period)
             {
@@ -620,20 +615,16 @@ public class PlayerLogic : MonoBehaviour
 
             if (Time.time - timeOnActionClick < period / 2f)
             {
-              //Debug.Log("sending message button pressed");
               message += "{B(1)}";
             }
           }
           else
           {
             action.enabled = true;
-            //action.interactable = true;
           }
 
           if (actionButtonPressed)
           {
-            //Debug.Log("sending message button pressed");
-            //message += "{B(1)}";
             actionButtonPressed = false;
           }
 
@@ -691,7 +682,7 @@ public class PlayerLogic : MonoBehaviour
               roleSendText.text = "R(0)";
 
             // send final message
-            PlayerSelection.udpClient.Send("{" + localIP + "}" + message);
+            PlayerSelection.udpClient.Send("{" + ConnectionData.localIP + "}" + message);
           }
         }
       }

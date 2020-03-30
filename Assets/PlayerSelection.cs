@@ -10,8 +10,6 @@ public class PlayerSelection : MonoBehaviour
 {
   // sending
   [HideInInspector]
-  public static TCPClient tcpClient;
-  [HideInInspector]
   public static UDPClient udpClient;
 
   [SerializeField]
@@ -29,9 +27,9 @@ public class PlayerSelection : MonoBehaviour
   [SerializeField]
   GameObject gameScreen;
 
-  public static bool oppsCommanderAvailable;
-  public static bool weaponsOfficerAvailable;
-  public static bool captainAvailable;
+  public static bool oppsCommanderAvailable = true;
+  public static bool weaponsOfficerAvailable = true;
+  public static bool captainAvailable = true;
 
   bool ocPressed = false;
   bool woPressed = false;
@@ -71,32 +69,35 @@ public class PlayerSelection : MonoBehaviour
 
   private void CommanderPressed()
   {
-    ocPressed = true;
+    StartScreen.tcpClient.Send(PackageType.Selection, RoleType.OppsCommander.ToString());
+
+    //ocPressed = true;
     timeOnPressed = Time.time;
     Debug.Log("Opps Commander Pressed");
     GetComponent<CanvasGroup>().alpha = 0f;
     GetComponent<CanvasGroup>().blocksRaycasts = false;
-
   }
 
   private void OfficerPressed()
   {
-    woPressed = true;
+    StartScreen.tcpClient.Send(PackageType.Selection, RoleType.WeaponsOfficer.ToString());
+
+    //woPressed = true;
     timeOnPressed = Time.time;
     Debug.Log("Weapons Officer Pressed");
     GetComponent<CanvasGroup>().alpha = 0f;
     GetComponent<CanvasGroup>().blocksRaycasts = false;
-
   }
 
   private void CaptainPressed()
   {
-    cptPressed = true;
+    StartScreen.tcpClient.Send(PackageType.Selection, RoleType.Captain.ToString());
+    
+    //cptPressed = true;
     timeOnPressed = Time.time;
     Debug.Log("Captain pressed");
     GetComponent<CanvasGroup>().alpha = 0f;
     GetComponent<CanvasGroup>().blocksRaycasts = false;
-    
   }
 
   public void ResetRoles()
@@ -106,11 +107,7 @@ public class PlayerSelection : MonoBehaviour
     captainAvailable = false;
   }
 
-  void initTCP()
-  {
-    tcpClient = new TCPClient(ConnectionData.selectedIP, ConnectionData.portOutTCP);
-    tcpClient.Initiate();
-  }
+
 
   void initUDP()
   {
@@ -136,10 +133,6 @@ public class PlayerSelection : MonoBehaviour
         gameScreen.GetComponent<PlayerLogic>().valid_connection = true;
 
         initUDP();
-
-        gameScreen.GetComponent<PlayerLogic>().localIP = UDPClient.GetLocalIPAddress();
-
-        initTCP();
         Debug.Log("Connection Established");
       }
 
@@ -152,6 +145,7 @@ public class PlayerSelection : MonoBehaviour
         udpClient.Send("{" + UDPClient.GetLocalIPAddress() + "}{R(?)}");
       }
 
+      /*
       int woPos = udpClient.ReceivedMessage.IndexOf("WO:");
       if (woPos != -1)
       {
@@ -178,6 +172,7 @@ public class PlayerSelection : MonoBehaviour
 
         captainAvailable = temp.Equals("1");
       }
+      */
 
       if (!weaponsOfficerAvailable)
         confirmWeaponsOfficer.image.color = Color.grey;
@@ -193,49 +188,6 @@ public class PlayerSelection : MonoBehaviour
         confirmCaptain.image.color = Color.grey;
       else
         confirmCaptain.image.color = Color.white;
-
-      if (ocPressed)
-      {
-        if (Time.time - timeOnPressed < sendRolePeriod)
-        {
-          udpClient.Send("{" + UDPClient.GetLocalIPAddress() + "}{R(OC)}");
-        }
-        else
-        {
-          ocPressed = false;
-          hide();
-          gameScreen.GetComponent<PlayerLogic>().show();
-          gameScreen.GetComponent<PlayerLogic>().role = "OppsCommander";
-        }
-      }
-      else if (woPressed)
-      {
-        if (Time.time - timeOnPressed < sendRolePeriod)
-        {
-          udpClient.Send("{" + UDPClient.GetLocalIPAddress() + "}{R(WO)}");
-        }
-        else
-        {
-          woPressed = false;
-          hide();
-          gameScreen.GetComponent<PlayerLogic>().show();
-          gameScreen.GetComponent<PlayerLogic>().role = "WeaponsOfficer";
-        }
-      }
-      else if (cptPressed)
-      {
-        if (Time.time - timeOnPressed < sendRolePeriod)
-        {
-          udpClient.Send("{" + UDPClient.GetLocalIPAddress() + "}{R(CPT)}");
-        }
-        else
-        {
-          cptPressed = false;
-          hide();
-          gameScreen.GetComponent<PlayerLogic>().show();
-          gameScreen.GetComponent<PlayerLogic>().role = "Captain";
-        }
-      }
     }
   }
 }

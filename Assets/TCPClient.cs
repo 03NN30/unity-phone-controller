@@ -15,12 +15,13 @@ public class TCPClient
 
   public TCPClient(string host, int port)
   {
-    Debug.Log("Creating TCP Client");
     Host = host;
 
     Port = port;
 
     Roles = new List<RoleType>();
+
+    Id = Guid.NewGuid().ToString();
   }
 
   public string Host { get; set; }
@@ -97,9 +98,11 @@ public class TCPClient
 
   public async Task DataManager(Package p)
   {
+    Debug.Log("Incoming Package: " + p.packetType);
     switch (p.packetType)
     {
-      case PackageType.Connected:
+      case PackageType.Selection:
+        Debug.Log("Selection");
         await Task.Run(() =>
         {
           Id = p.data[0].ToString();
@@ -121,11 +124,24 @@ public class TCPClient
         });
         break;
 
+      case PackageType.Connected:
+        Debug.Log("Connected");
+        Id = p.senderId;
+        var roles = (bool[])p.data[0];
+
+        Debug.Log(roles[0] + ", " + roles[1] + ", " + roles[2]);
+
+        PlayerSelection.oppsCommanderAvailable = roles[0];
+        PlayerSelection.weaponsOfficerAvailable = roles[1];
+        PlayerSelection.captainAvailable = roles[2];
+        break;
+
       case PackageType.Disconnected:
-          
+        Debug.Log("Disconnected");
         break;
 
       case PackageType.ServerFull:
+        Debug.Log("Server Full");
         ServerFull?.Invoke(p.data[0], new EventArgs());
         break;
     }
