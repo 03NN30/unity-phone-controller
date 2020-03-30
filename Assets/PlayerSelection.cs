@@ -11,6 +11,8 @@ public class PlayerSelection : MonoBehaviour
 {
   // sending
   [HideInInspector]
+  public TCPClient tcpClient;
+  [HideInInspector]
   public IPEndPoint remoteEndPoint;
   [HideInInspector]
   public UdpClient client;
@@ -89,17 +91,7 @@ public class PlayerSelection : MonoBehaviour
     Debug.Log("Opps Commander Pressed");
     GetComponent<CanvasGroup>().alpha = 0f;
     GetComponent<CanvasGroup>().blocksRaycasts = false;
-    /*
-    if (oppsCommanderAvailable)
-    {
-      hide();
-      gameScreen.GetComponent<PlayerLogic>().show();
-      gameScreen.GetComponent<PlayerLogic>().role = "OppsCommander";
 
-      // once received it will send a confirmation message back
-      Send("{" + GetLocalIPAddress() + "}{R(OC)}");
-    }
-    */
   }
 
   private void OfficerPressed()
@@ -109,17 +101,7 @@ public class PlayerSelection : MonoBehaviour
     Debug.Log("Weapons Officer Pressed");
     GetComponent<CanvasGroup>().alpha = 0f;
     GetComponent<CanvasGroup>().blocksRaycasts = false;
-    /*
-    if (weaponsOfficerAvailable)
-    {
-      hide();
-      gameScreen.GetComponent<PlayerLogic>().show();
-      gameScreen.GetComponent<PlayerLogic>().role = "WeaponsOfficer";
 
-      // once received it will send a confirmation message back
-      Send("{" + GetLocalIPAddress() + "}{R(WO)}");
-    }
-    */
   }
 
   private void CaptainPressed()
@@ -129,17 +111,7 @@ public class PlayerSelection : MonoBehaviour
     Debug.Log("Captain pressed");
     GetComponent<CanvasGroup>().alpha = 0f;
     GetComponent<CanvasGroup>().blocksRaycasts = false;
-    /*
-    if (captainAvailable)
-    {
-      hide();
-      gameScreen.GetComponent<PlayerLogic>().show();
-      gameScreen.GetComponent<PlayerLogic>().role = "Captain";
-
-      // once received it will send a confirmation message back
-      Send("{" + GetLocalIPAddress() + "}{R(CPT)}");
-    }
-    */
+    
   }
 
   public void ResetRoles()
@@ -147,6 +119,14 @@ public class PlayerSelection : MonoBehaviour
     oppsCommanderAvailable = false;
     weaponsOfficerAvailable = false;
     captainAvailable = false;
+  }
+
+  void initTCP()
+  {
+    var temp = connectionData.GetComponent<ConnectionData>();
+    tcpClient = new TCPClient(temp.selectedIP, temp.selectedPortTCP);
+
+    tcpClient.Initiate();
   }
 
   void Start()
@@ -203,6 +183,7 @@ public class PlayerSelection : MonoBehaviour
 
         gameScreen.GetComponent<PlayerLogic>().localIP = GetLocalIPAddress().ToString();
 
+        initTCP();
         Debug.Log("Connection Established");
       }
 

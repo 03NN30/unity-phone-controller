@@ -8,6 +8,8 @@ using System.Collections;
 
 public class PlayerLogic : MonoBehaviour
 {
+  [SerializeField]
+  Button testButton;
   [HideInInspector]
   public bool valid_input;
   [HideInInspector]
@@ -127,6 +129,15 @@ public class PlayerLogic : MonoBehaviour
     confirmFlashlightStraightButton.onClick.AddListener(confirmFlashlightStraightPressed);
 
     disconnectButton.onClick.AddListener(ConfirmDisconnectButton);
+
+    testButton.onClick.AddListener(TestButtonPressed);
+  }
+
+  void TestButtonPressed()
+  {
+    Debug.Log("ZA WARUDO!!!!");
+    var tcpClient = playerSelection.GetComponent<PlayerSelection>().tcpClient;
+    tcpClient.Send(PackageType.Connected, RoleType.Captain.ToString());
   }
 
   private void ConfirmDisconnectButton()
@@ -257,7 +268,6 @@ public class PlayerLogic : MonoBehaviour
   {
     if (confirmPhoneStraight)
     {
-      //Debug.Log("ok bro");
       if (Time.time - timeOnConfirmPhoneStraight > timeToWaitForCalibrationStep)
       {
         Debug.Log("Calibration: Phone straight off");

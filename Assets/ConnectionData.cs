@@ -7,6 +7,7 @@ public class ConnectionData : MonoBehaviour
   [HideInInspector]
   public int selectedPort;
 
+  public int selectedPortTCP;
   public int portOut;
   public int portIn;
   public string domeIP;
