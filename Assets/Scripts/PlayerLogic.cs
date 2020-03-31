@@ -12,6 +12,8 @@ public class PlayerLogic : Layer
   private GameObject startScreen;
   [SerializeField]
   private GameObject playerSelection;
+  [SerializeField]
+  private GameObject action;
   #endregion
   #region UI
   [SerializeField]
@@ -38,12 +40,29 @@ public class PlayerLogic : Layer
   private Button confirmFlashlightStraightButton;
   #endregion
 
+  [SerializeField]
+  private float coolDownLength = 5f;
+  private float timeOnActionPressed = 0f;
+  private bool coolDown = false;
+
+  #region Buttons
   private void OnEnable()
   {
     disconnectButton.onClick.AddListener(DisconnectPressed);
     startCalibrationButton.onClick.AddListener(StartCalibrationPressed);
     confirmPhoneStraightButton.onClick.AddListener(ConfirmPhoneStraightPressed);
     confirmFlashlightStraightButton.onClick.AddListener(ConfirmFlashlightStraightPressed);
+    actionButton.onClick.AddListener(ActionPressed);
+  }
+
+  private void ActionPressed()
+  {
+    if (coolDown)
+      return;
+
+    Layer.tcpClient.Send(PackageType.Action, Layer.role.ToString());
+    timeOnActionPressed = Time.time;
+    coolDown = true;
   }
 
   private void DisconnectPressed()
@@ -53,7 +72,6 @@ public class PlayerLogic : Layer
     startScreen.GetComponent<StartScreen>().Show();
   }
 
-  #region Calibration
   private void StartCalibrationPressed()
   {
     confirmPhoneStraightButton.gameObject.SetActive(!confirmPhoneStraightButton.gameObject.active);
@@ -61,7 +79,8 @@ public class PlayerLogic : Layer
 
     SetFlashlightStraightUI(false);
   }
-
+  #endregion
+  #region Calibration
   private void SetPhoneStraightUI(bool visible)
   {
     confirmPhoneStraightButton.gameObject.SetActive(visible);
@@ -142,6 +161,7 @@ public class PlayerLogic : Layer
     Hide();
     SetPhoneStraightUI(false);
     SetFlashlightStraightUI(false);
+    // action.SetActive(false);
 
     actionButton.GetComponent<Image>().sprite = greenSprite;
   }
@@ -150,6 +170,9 @@ public class PlayerLogic : Layer
   {
     if (active)
     {
+      if (Time.time - timeOnActionPressed > coolDownLength)
+        coolDown = false;
+      
       AddRoleToMessage();
       AddAccelerometerToMessage();
       AddGyroToMessage();
@@ -163,8 +186,6 @@ public class PlayerLogic : Layer
   private Quaternion prev_gyro_rotation = new Quaternion();
 
   bool actionButtonPressed;
-  bool actionCoolDown = false;
-
   
   private int currentLevel = 1;
   private bool inCave = false;
