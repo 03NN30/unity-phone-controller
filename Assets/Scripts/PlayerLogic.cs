@@ -358,19 +358,19 @@ public class PlayerLogic : Layer
           break;
 
         case 2:
-          PlayGlitchEffect(0.01f, 0.089f, 0.059f, 0.094f, 0.240f);
+          PlayGlitchEffect(0.01f, 0.1f, 0f, 0f, 0f);
           break;
 
         case 3:
-          PlayGlitchEffect(0.05f, 0.089f, 0.059f, 0.094f, 0.240f);
+          PlayGlitchEffect(0.02f, 0.2f, 0.011f, 0.011f, 0.011f);
           break;
 
         case 4:
-          PlayGlitchEffect(0.1f, 0.517f, 0.234f, 0.661f, 0.492f);
+          PlayGlitchEffect(0.03f, 0.3f, 0.022f, 0.022f, 0.022f);
           break;
 
         case 5:
-          PlayGlitchEffect(0.3f, 0.517f, 0.234f, 0.661f, 0.492f);
+          PlayGlitchEffect(0.04f, 0.4f, 0.033f, 0.033f, 0.033f);
           break;
       }
     }
