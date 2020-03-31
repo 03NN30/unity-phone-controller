@@ -14,7 +14,8 @@ public enum PackageType
   Selection,
   Calibrate1,
   Calibrate2,
-  Action
+  Action,
+  Level
 }
 
 public enum RoleType

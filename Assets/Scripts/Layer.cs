@@ -12,6 +12,12 @@ public class Layer : MonoBehaviour
 
   protected bool active = false;
   protected static RoleType role;
+  [HideInInspector]
+  public static int Level { get; set; }
+  [HideInInspector]
+  public static bool LevelChanged { get; set; }
+  [HideInInspector]
+  public static float TimeOnLevelChanged { get; set; }
 
   public virtual void Hide()
   {

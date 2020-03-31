@@ -102,7 +102,6 @@ public class TCPClient
     switch (p.packetType)
     {
       case PackageType.Selection:
-        Debug.Log("Selection");
         await Task.Run(() =>
         {
           Id = p.senderId;
@@ -110,22 +109,17 @@ public class TCPClient
 
           // disable roles
           if (toDisable == RoleType.OppsCommander)
-          {
             PlayerSelection.oppsCommanderAvailable = false;
-          }
+
           else if (toDisable == RoleType.WeaponsOfficer)
-          {
             PlayerSelection.weaponsOfficerAvailable = false;
-          }
+
           else if (toDisable == RoleType.Captain)
-          {
             PlayerSelection.captainAvailable = false;
-          }
         });
         break;
 
       case PackageType.Connected: case PackageType.Disconnected:
-        Debug.Log("Connected | Disconnected");
         Id = p.senderId;
         var roles = (bool[])p.data[0];
 
@@ -137,8 +131,14 @@ public class TCPClient
         break;
 
       case PackageType.ServerFull:
-        Debug.Log("Server Full");
         ServerFull?.Invoke(p.data[0], new EventArgs());
+        break;
+
+      case PackageType.Level:
+        Id = p.senderId;
+        Layer.Level = (int)p.data[0];
+        Debug.Log("TCPClient: Entered Level " + Layer.Level);
+        Layer.LevelChanged = true;
         break;
     }
   }
