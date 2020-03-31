@@ -138,21 +138,7 @@ public class TCPClient
         Id = p.senderId;
         Layer.Level = (int)p.data[0];
         Debug.Log("TCPClient: Entered Level " + Layer.Level);
-        Layer.LevelChanged = true;
-
-        if (Layer.Role == RoleType.OppsCommander)
-        {
-
-        }
-        else if (Layer.Role == RoleType.WeaponsOfficer)
-        {
-
-        }
-        else if (Layer.Role == RoleType.Captain)
-        {
-
-        }
-
+        Layer.LevelChanged = true;       
         break;
     }
   }
