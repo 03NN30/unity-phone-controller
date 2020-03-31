@@ -11,7 +11,8 @@ public class Layer : MonoBehaviour
   protected static bool accelerometer = false;
 
   protected bool active = false;
-  protected static RoleType role;
+  [HideInInspector]
+  public static RoleType Role { get; set; }
   [HideInInspector]
   public static int Level { get; set; }
   [HideInInspector]

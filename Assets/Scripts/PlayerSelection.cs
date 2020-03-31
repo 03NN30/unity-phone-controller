@@ -47,21 +47,21 @@ public class PlayerSelection : Layer
   private void CommanderPressed()
   {
     Layer.tcpClient.Send(PackageType.Selection, RoleType.OppsCommander.ToString());
-    Layer.role = RoleType.OppsCommander;
+    Layer.Role = RoleType.OppsCommander;
     Continue();
   }
 
   private void OfficerPressed()
   {
     Layer.tcpClient.Send(PackageType.Selection, RoleType.WeaponsOfficer.ToString());
-    Layer.role = RoleType.WeaponsOfficer;
+    Layer.Role = RoleType.WeaponsOfficer;
     Continue();
   }
 
   private void CaptainPressed()
   {
     Layer.tcpClient.Send(PackageType.Selection, RoleType.Captain.ToString());
-    Layer.role = RoleType.Captain;
+    Layer.Role = RoleType.Captain;
     Continue();
   }
 

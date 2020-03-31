@@ -62,7 +62,7 @@ public class PlayerLogic : Layer
     if (coolDown)
       return;
 
-    Layer.tcpClient.Send(PackageType.Action, Layer.role.ToString());
+    Layer.tcpClient.Send(PackageType.Action, Layer.Role.ToString());
     timeOnActionPressed = Time.time;
     actionButton.GetComponent<Image>().sprite = redSprite;
     coolDown = true;
@@ -70,7 +70,7 @@ public class PlayerLogic : Layer
 
   private void DisconnectPressed()
   {
-    Layer.tcpClient.Send(PackageType.Disconnected, Layer.role.ToString());
+    Layer.tcpClient.Send(PackageType.Disconnected, Layer.Role.ToString());
     Hide();
     startScreen.GetComponent<StartScreen>().Show();
   }
@@ -102,7 +102,7 @@ public class PlayerLogic : Layer
     SetPhoneStraightUI(false);
     SetFlashlightStraightUI(true);
 
-    Layer.tcpClient.Send(PackageType.Calibrate1, Layer.role.ToString());
+    Layer.tcpClient.Send(PackageType.Calibrate1, Layer.Role.ToString());
   }
 
   private void ConfirmFlashlightStraightPressed()
@@ -110,7 +110,7 @@ public class PlayerLogic : Layer
     SetPhoneStraightUI(false);
     SetFlashlightStraightUI(false);
 
-    Layer.tcpClient.Send(PackageType.Calibrate2, Layer.role.ToString());
+    Layer.tcpClient.Send(PackageType.Calibrate2, Layer.Role.ToString());
      
     startCalibrationButton.image.color = Color.green;
   }
@@ -119,7 +119,7 @@ public class PlayerLogic : Layer
   #region Messages
   private void AddRoleToMessage()
   {
-    switch (Layer.role)
+    switch (Layer.Role)
     {
       case RoleType.OppsCommander:
         Layer.udpClient.Message = "{R(" + RoleType.OppsCommander.ToString() + ")}";
@@ -233,96 +233,95 @@ public class PlayerLogic : Layer
       // make sure UI disappears temporarily on level changed event
       if (!Layer.LevelChanged)
       {
+        if (Layer.Role == RoleType.OppsCommander)
+        {
+          switch (Layer.Level)
+          {
+            case 0:
+              AddGyroToMessage();
+              break;
+
+            case 1:
+              AddAccelerometerToMessage(Action.Reload);
+              break;
+
+            case 2:
+              AddAccelerometerToMessage(Action.Fire);
+              break;
+
+            case 3:
+              AddGyroToMessage();
+              break;
+
+            case 4:
+              AddAccelerometerToMessage(Action.Reload);
+              break;
+
+            case 5:
+              AddAccelerometerToMessage(Action.Fire);
+              break;
+          }
+        }
+        else if (Layer.Role == RoleType.WeaponsOfficer)
+        {
+          switch (Layer.Level)
+          {
+            case 0:
+              AddGyroToMessage();
+              break;
+
+            case 1:
+              AddAccelerometerToMessage(Action.Fire);
+              break;
+
+            case 2:
+              AddGyroToMessage();
+              break;
+
+            case 3:
+              AddAccelerometerToMessage(Action.Reload);
+              break;
+
+            case 4:
+              AddAccelerometerToMessage(Action.Fire);
+              break;
+
+            case 5:
+              AddGyroToMessage();
+              break;
+          }
+        }
+        else if (Layer.Role == RoleType.Captain)
+        {
+          switch (Layer.Level)
+          {
+            case 0:
+              AddGyroToMessage();
+              break;
+
+            case 1:
+              AddGyroToMessage();
+              break;
+
+            case 2:
+              AddAccelerometerToMessage(Action.Reload);
+              break;
+
+            case 3:
+              AddAccelerometerToMessage(Action.Fire);
+              break;
+
+            case 4:
+              AddGyroToMessage();
+              break;
+
+            case 5:
+              AddAccelerometerToMessage(Action.Reload);
+              break;
+          }
+        }
+
         AddRoleToMessage();
-
-        if (Layer.role == RoleType.OppsCommander)
-        {
-          switch (Layer.Level)
-          {
-            case 0:
-              AddGyroToMessage();
-              break;
-
-            case 1:
-              AddAccelerometerToMessage(Action.Reload);
-              break;
-
-            case 2:
-              AddAccelerometerToMessage(Action.Fire);
-              break;
-
-            case 3:
-              AddGyroToMessage();
-              break;
-
-            case 4:
-              AddAccelerometerToMessage(Action.Reload);
-              break;
-
-            case 5:
-              AddAccelerometerToMessage(Action.Fire);
-              break;
-          }
-        }
-        else if (Layer.role == RoleType.WeaponsOfficer)
-        {
-          switch (Layer.Level)
-          {
-            case 0:
-              AddGyroToMessage();
-              break;
-
-            case 1:
-              AddAccelerometerToMessage(Action.Fire);
-              break;
-
-            case 2:
-              AddGyroToMessage();
-              break;
-
-            case 3:
-              AddAccelerometerToMessage(Action.Reload);
-              break;
-
-            case 4:
-              AddAccelerometerToMessage(Action.Fire);
-              break;
-
-            case 5:
-              AddGyroToMessage();
-              break;
-          }
-        }
-        else if (Layer.role == RoleType.Captain)
-        {
-          switch (Layer.Level)
-          {
-            case 0:
-              AddGyroToMessage();
-              break;
-
-            case 1:
-              AddGyroToMessage();
-              break;
-
-            case 2:
-              AddAccelerometerToMessage(Action.Reload);
-              break;
-
-            case 3:
-              AddAccelerometerToMessage(Action.Fire);
-              break;
-
-            case 4:
-              AddGyroToMessage();
-              break;
-
-            case 5:
-              AddAccelerometerToMessage(Action.Reload);
-              break;
-          }
-        }
-
         Layer.udpClient.Send();
       }
       else
