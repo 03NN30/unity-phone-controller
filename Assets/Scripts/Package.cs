@@ -9,12 +9,11 @@ using UnityEngine;
 public enum PackageType
 {
   Connected,
-  Sensor,
   ServerFull,
   Disconnected,
+  Selection,
   Calibrate1,
-  Calibrate2,
-  Selection
+  Calibrate2
 }
 
 public enum RoleType

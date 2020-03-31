@@ -105,7 +105,7 @@ public class TCPClient
         Debug.Log("Selection");
         await Task.Run(() =>
         {
-          Id = p.data[0].ToString();
+          Id = p.senderId;
           var toDisable = (RoleType)Enum.Parse(typeof(RoleType), p.data[1].ToString());
 
           // disable roles
@@ -124,8 +124,8 @@ public class TCPClient
         });
         break;
 
-      case PackageType.Connected:
-        Debug.Log("Connected");
+      case PackageType.Connected: case PackageType.Disconnected:
+        Debug.Log("Connected | Disconnected");
         Id = p.senderId;
         var roles = (bool[])p.data[0];
 
@@ -134,10 +134,6 @@ public class TCPClient
         PlayerSelection.oppsCommanderAvailable = roles[0];
         PlayerSelection.weaponsOfficerAvailable = roles[1];
         PlayerSelection.captainAvailable = roles[2];
-        break;
-
-      case PackageType.Disconnected:
-        Debug.Log("Disconnected");
         break;
 
       case PackageType.ServerFull:

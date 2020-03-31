@@ -3211,31 +3211,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d83f2b0be198fa49bb46baa1e2ef9c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  glitchLength: 3
   camera: {fileID: 519420028}
   connectionData: {fileID: 686956440}
   startScreen: {fileID: 762859814}
   playerSelection: {fileID: 1143124262}
-  actualActionObject: {fileID: 1749018792}
   redSprite: {fileID: 21300000, guid: fcf824810cbce4b41b39f8f6b9545277, type: 3}
   greenSprite: {fileID: 21300000, guid: abef63703b54cdf4d91a06d4a7e2f348, type: 3}
-  action: {fileID: 1749018794}
+  actionButton: {fileID: 1749018794}
   disconnectButton: {fileID: 483367400}
-  actionButtonText: {fileID: 1994889525}
-  errorMessage: {fileID: 0}
-  gyroText: {fileID: 0}
-  accelText: {fileID: 0}
-  buttonText: {fileID: 0}
-  disconnectText: {fileID: 0}
-  presentText: {fileID: 0}
-  roleAskText: {fileID: 0}
-  roleSendText: {fileID: 0}
-  initCalibrationButton: {fileID: 1461352910}
+  startCalibrationButton: {fileID: 1461352910}
   phoneStraightInstructions: {fileID: 2059413202}
   confirmPhoneStraightButton: {fileID: 456255893}
   flashlightStraightInstructions: {fileID: 1508840142}
   confirmFlashlightStraightButton: {fileID: 1249264799}
-  printMessageOut: 0
+  glitchLength: 3
 --- !u!1 &1101374553
 GameObject:
   m_ObjectHideFlags: 0
@@ -4290,7 +4279,7 @@ GameObject:
   - component: {fileID: 1461352911}
   - component: {fileID: 1461352910}
   m_Layer: 5
-  m_Name: InitCalibrationButton
+  m_Name: StartCalibrationButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4550,8 +4539,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Hold your phone so that the flashlight points straight ahead, press confirm
-    and hold for 2 seconds.
+  m_Text: Hold your phone so that the flashlight points straight ahead and press confirm.
 --- !u!222 &1508840143
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6068,7 +6056,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Hold your phone straight, press confirm and hold for 2 seconds.
+  m_Text: Hold your phone straight and press confirm.
 --- !u!222 &2059413203
 CanvasRenderer:
   m_ObjectHideFlags: 0

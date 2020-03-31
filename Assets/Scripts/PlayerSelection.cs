@@ -40,6 +40,7 @@ public class PlayerSelection : Layer
   void BackPressed()
   {
     Hide();
+    Layer.tcpClient.Send(PackageType.Disconnected, "");
     startScreen.GetComponent<StartScreen>().Show();
   }
 
@@ -47,8 +48,6 @@ public class PlayerSelection : Layer
   {
     Layer.tcpClient.Send(PackageType.Selection, RoleType.OppsCommander.ToString());
     Layer.role = RoleType.OppsCommander;
-
-    Debug.Log("Opps Commander Pressed");
     Continue();
   }
 
@@ -56,8 +55,6 @@ public class PlayerSelection : Layer
   {
     Layer.tcpClient.Send(PackageType.Selection, RoleType.WeaponsOfficer.ToString());
     Layer.role = RoleType.WeaponsOfficer;
-
-    Debug.Log("Weapons Officer Pressed");
     Continue();
   }
 
@@ -65,8 +62,6 @@ public class PlayerSelection : Layer
   {
     Layer.tcpClient.Send(PackageType.Selection, RoleType.Captain.ToString());
     Layer.role = RoleType.Captain;
-    
-    Debug.Log("Captain pressed");
     Continue();
   }
 

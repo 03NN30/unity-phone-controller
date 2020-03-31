@@ -5,15 +5,13 @@ public class PlayerLogic : Layer
 {
   #region GameObjects
   [SerializeField]
-  GameObject camera;
+  private GameObject camera;
   [SerializeField]
-  GameObject connectionData;
+  private GameObject connectionData;
   [SerializeField]
-  GameObject startScreen;
+  private GameObject startScreen;
   [SerializeField]
-  GameObject playerSelection;
-  [SerializeField]
-  GameObject actualActionObject;
+  private GameObject playerSelection;
   #endregion
   #region UI
   [SerializeField]
@@ -22,25 +20,79 @@ public class PlayerLogic : Layer
   Sprite greenSprite;
 
   [SerializeField]
-  Button action;
+  Button actionButton;
   [SerializeField]
   Button disconnectButton;
 
   // calibration
   [SerializeField]
-  Button initCalibrationButton;
+  private Button startCalibrationButton;
+  [SerializeField]
+  private Text phoneStraightInstructions;
+  [SerializeField]
+  private Button confirmPhoneStraightButton;
 
   [SerializeField]
-  Text phoneStraightInstructions;
+  private Text flashlightStraightInstructions;
   [SerializeField]
-  Button confirmPhoneStraightButton;
-
-  [SerializeField]
-  Text flashlightStraightInstructions;
-  [SerializeField]
-  Button confirmFlashlightStraightButton;
+  private Button confirmFlashlightStraightButton;
   #endregion
 
+  private void OnEnable()
+  {
+    disconnectButton.onClick.AddListener(DisconnectPressed);
+    startCalibrationButton.onClick.AddListener(StartCalibrationPressed);
+    confirmPhoneStraightButton.onClick.AddListener(ConfirmPhoneStraightPressed);
+    confirmFlashlightStraightButton.onClick.AddListener(ConfirmFlashlightStraightPressed);
+  }
+
+  private void DisconnectPressed()
+  {
+    Layer.tcpClient.Send(PackageType.Disconnected, Layer.role.ToString());
+    Hide();
+    startScreen.GetComponent<StartScreen>().Show();
+  }
+
+  #region Calibration
+  private void StartCalibrationPressed()
+  {
+    confirmPhoneStraightButton.gameObject.SetActive(!confirmPhoneStraightButton.gameObject.active);
+    phoneStraightInstructions.enabled = !phoneStraightInstructions.enabled;
+
+    SetFlashlightStraightUI(false);
+  }
+
+  private void SetPhoneStraightUI(bool visible)
+  {
+    confirmPhoneStraightButton.gameObject.SetActive(visible);
+    phoneStraightInstructions.enabled = visible;
+  }
+
+  private void SetFlashlightStraightUI(bool visible)
+  {
+    confirmFlashlightStraightButton.gameObject.SetActive(visible);
+    flashlightStraightInstructions.enabled = visible;
+  }
+
+  private void ConfirmPhoneStraightPressed()
+  {
+    SetPhoneStraightUI(false);
+    SetFlashlightStraightUI(true);
+
+    Layer.tcpClient.Send(PackageType.Calibrate1, Layer.role.ToString());
+  }
+
+  private void ConfirmFlashlightStraightPressed()
+  {
+    SetPhoneStraightUI(false);
+    SetFlashlightStraightUI(false);
+
+    Layer.tcpClient.Send(PackageType.Calibrate2, Layer.role.ToString());
+     
+    startCalibrationButton.image.color = Color.green;
+  }
+  #endregion
+  #region Messages
   private void AddRoleToMessage()
   {
     switch (Layer.role)
@@ -83,10 +135,15 @@ public class PlayerLogic : Layer
       Layer.udpClient.Message += "{A" + accleration.ToString("G9") + "}";
     }
   }
+  #endregion
 
   private void Start()
   {
     Hide();
+    SetPhoneStraightUI(false);
+    SetFlashlightStraightUI(false);
+
+    actionButton.GetComponent<Image>().sprite = greenSprite;
   }
 
   private void Update()
@@ -477,49 +534,6 @@ public class PlayerLogic : Layer
     }
 
     actionCoolDown = true;
-  }
-
-  void setPhoneStraightUI(bool visible)
-  {
-    confirmPhoneStraightButton.gameObject.SetActive(visible);
-    phoneStraightInstructions.enabled = visible;
-  }
-
-  void setFlashlightStraightUI(bool visible)
-  {
-    confirmFlashlightStraightButton.gameObject.SetActive(visible);
-    flashlightStraightInstructions.enabled = visible;
-  }
-
-  private void initCalibrationPressed()
-  {
-    confirmPhoneStraightButton.gameObject.SetActive(!confirmPhoneStraightButton.gameObject.active);
-    phoneStraightInstructions.enabled = !phoneStraightInstructions.enabled;
-
-    setFlashlightStraightUI(false);
-  }
-
-  private void confirmPhoneStraightPressed()
-  {
-    setPhoneStraightUI(false);
-    setFlashlightStraightUI(true);
-
-    confirmPhoneStraight = true;
-    timeOnConfirmPhoneStraight = Time.time;
-  }
-
-  private void confirmFlashlightStraightPressed()
-  {
-    if (!confirmPhoneStraight)
-    {
-      setPhoneStraightUI(false);
-      setFlashlightStraightUI(false);
-
-      confirmFlashLightStraight = true;
-      timeOnConfirmFlashlightStraight = Time.time;
-
-      initCalibrationButton.image.color = Color.green;
-    }
   }
 
   public override void Hide()
