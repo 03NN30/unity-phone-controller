@@ -64,6 +64,7 @@ public class PlayerLogic : Layer
 
     Layer.tcpClient.Send(PackageType.Action, Layer.role.ToString());
     timeOnActionPressed = Time.time;
+    actionButton.GetComponent<Image>().sprite = redSprite;
     coolDown = true;
   }
 
@@ -224,11 +225,16 @@ public class PlayerLogic : Layer
     if (active)
     {
       if (Time.time - timeOnActionPressed > coolDownLength)
+      {
         coolDown = false;
+        actionButton.GetComponent<Image>().sprite = greenSprite;
+      }
 
       // make sure UI disappears temporarily on level changed event
       if (!Layer.LevelChanged)
       {
+        AddRoleToMessage();
+
         if (Layer.role == RoleType.OppsCommander)
         {
           switch (Layer.Level)
