@@ -35,19 +35,19 @@ public class StartScreen : Layer
     {
       case "Dome":
         ConnectionData.selectedIP = ConnectionData.domeIP;
-        Debug.Log("Continuing with Dome [" + ConnectionData.selectedIP);
+        Debug.Log("Continuing with Dome: " + ConnectionData.selectedIP);
         playerSelection.GetComponent<PlayerSelection>().Show();
         break;
 
       case "WE":
         ConnectionData.selectedIP = ConnectionData.weIP;
-        Debug.Log("Continuing with Debug (WE) [" + ConnectionData.selectedIP);
+        Debug.Log("Continuing with Debug (WE): " + ConnectionData.selectedIP);
         playerSelection.GetComponent<PlayerSelection>().Show();
         break;
 
       case "SM":
         ConnectionData.selectedIP = ConnectionData.smIP;
-        Debug.Log("Continuing with Debug (SM) [" + ConnectionData.selectedIP);
+        Debug.Log("Continuing with Debug (SM): " + ConnectionData.selectedIP);
         playerSelection.GetComponent<PlayerSelection>().Show();
         break;
 
