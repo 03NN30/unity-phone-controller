@@ -137,8 +137,17 @@ public class TCPClient
       case PackageType.Level:
         Id = p.senderId;
         Layer.Level = (int)p.data[0];
-        Debug.Log("TCPClient: Entered Level " + Layer.Level);
-        Layer.LevelChanged = true;       
+
+        if (Layer.Level == 0)
+        {
+          Debug.Log("TCPClient: Entered Cave");
+        }
+        else
+        {
+          Debug.Log("TCPClient: Entered Level " + Layer.Level);
+          Layer.LevelChanged = true;       
+        }
+
         break;
     }
   }
