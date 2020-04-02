@@ -123,7 +123,7 @@ public class TCPClient
         Id = p.senderId;
         var roles = (bool[])p.data[0];
 
-        Debug.Log(roles[0] + ", " + roles[1] + ", " + roles[2]);
+        //Debug.Log(roles[0] + ", " + roles[1] + ", " + roles[2]);
 
         PlayerSelection.oppsCommanderAvailable = roles[0];
         PlayerSelection.weaponsOfficerAvailable = roles[1];
@@ -135,7 +135,6 @@ public class TCPClient
         break;
 
       case PackageType.Level:
-        Id = p.senderId;
         Layer.Level = (int)p.data[0];
 
         if (Layer.Level == 0)
@@ -147,7 +146,6 @@ public class TCPClient
           Debug.Log("TCPClient: Entered Level " + Layer.Level);
           Layer.LevelChanged = true;       
         }
-
         break;
     }
   }

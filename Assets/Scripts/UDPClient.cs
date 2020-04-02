@@ -13,9 +13,9 @@ public class UDPClient
   public string ReceivedMessage { get; set; }
   public string Message { get; set; }
 
-  private IPEndPoint remoteEndPoint;
-  private UdpClient udpClient;
-  private bool listener;
+  private IPEndPoint remoteEndPoint = null;
+  private UdpClient udpClient = null;
+  private bool listener = true;
 
   public UDPClient(bool listener)
   {

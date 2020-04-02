@@ -7,38 +7,38 @@ public class PlayerLogic : Layer
 {
   #region GameObjects
   [SerializeField]
-  private GameObject calibration;
+  private GameObject calibration = null;
   [SerializeField]
-  private GameObject cam;
+  private GameObject cam = null;
   [SerializeField]
-  private GameObject startScreen;
+  private GameObject startScreen = null;
   [SerializeField]
-  private GameObject action;
+  private GameObject action = null;
   #endregion
 
   #region UI
   [SerializeField]
-  private Sprite redSprite;
+  private Sprite redSprite = null;
   [SerializeField]
-  private Sprite greenSprite;
+  private Sprite greenSprite = null;
 
   [SerializeField]
-  private Button actionButton;
+  private Button actionButton = null;
   [SerializeField]
-  private Button disconnectButton;
+  private Button disconnectButton = null;
 
   // calibration
   [SerializeField]
-  private Button startCalibrationButton;
+  private Button startCalibrationButton = null;
   [SerializeField]
-  private Text phoneStraightInstructions;
+  private Text phoneStraightInstructions = null;
   [SerializeField]
-  private Button confirmPhoneStraightButton;
+  private Button confirmPhoneStraightButton = null;
 
   [SerializeField]
-  private Text flashlightStraightInstructions;
+  private Text flashlightStraightInstructions = null;
   [SerializeField]
-  private Button confirmFlashlightStraightButton;
+  private Button confirmFlashlightStraightButton = null;
   #endregion
 
   [SerializeField]

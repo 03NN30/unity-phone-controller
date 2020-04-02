@@ -5,21 +5,19 @@ public class StartScreen : Layer
 {
   #region GameObjects
   [SerializeField]
-  GameObject manualConfiguration;
+  GameObject manualConfiguration = null;
   [SerializeField]
-  GameObject playerSelection;
-  [SerializeField]
-  GameObject gameScreen;
+  GameObject playerSelection = null;
   #endregion
   #region UI
   [SerializeField]
-  Text gyroSupport;
+  Text gyroSupport = null;
   [SerializeField]
-  Text accelerometerSupport;
+  Text accelerometerSupport = null;
   [SerializeField]
-  Button continueButton;
+  Button continueButton = null;
   [SerializeField]
-  Dropdown dropdown;
+  Dropdown dropdown = null;
   #endregion
 
   private void OnEnable()

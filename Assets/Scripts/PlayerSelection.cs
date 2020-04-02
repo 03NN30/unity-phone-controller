@@ -10,19 +10,19 @@ public class PlayerSelection : Layer
 {
   #region GameObjects
   [SerializeField]
-  GameObject startScreen;
+  GameObject startScreen = null;
   [SerializeField]
-  GameObject gameScreen;
+  GameObject gameScreen = null;
   #endregion
   #region UI
   [SerializeField]
-  Button confirmOppsCommander;
+  Button confirmOppsCommander = null;
   [SerializeField]
-  Button confirmWeaponsOfficer;
+  Button confirmWeaponsOfficer = null;
   [SerializeField]
-  Button confirmCaptain;
+  Button confirmCaptain = null;
   [SerializeField]
-  Button backButton;
+  Button backButton = null;
   #endregion
 
   public static bool oppsCommanderAvailable = true;

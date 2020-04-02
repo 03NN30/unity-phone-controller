@@ -7,22 +7,20 @@ public class ManualConfiguration : Layer
 {
   #region GameObjects
   [SerializeField]
-  GameObject playerSelection;
+  GameObject playerSelection = null;
   [SerializeField]
-  GameObject gameScreen;
-  [SerializeField]
-  GameObject startScreen;
+  GameObject startScreen = null;
   #endregion
   #region UI
   [SerializeField]
-  InputField inIP;
+  InputField inIP = null;
   [SerializeField]
-  InputField inPort;
+  InputField inPort = null;
 
   [SerializeField]
-  Button connect;
+  Button connect = null;
   [SerializeField]
-  Button backButton;
+  Button backButton = null;
   #endregion
 
   private void OnEnable()
