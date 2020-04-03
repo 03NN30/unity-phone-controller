@@ -123,15 +123,15 @@ public class PlayerLogic : Layer
     switch (Layer.Role)
     {
       case RoleType.OppsCommander:
-        Layer.udpClient.Message = "{R(" + RoleType.OppsCommander.ToString() + ")}";
+        Layer.udpClient.Message += "{R(" + RoleType.OppsCommander.ToString() + ")}";
         break;
 
       case RoleType.WeaponsOfficer:
-        Layer.udpClient.Message = "{R(" + RoleType.WeaponsOfficer.ToString() + ")}";
+        Layer.udpClient.Message += "{R(" + RoleType.WeaponsOfficer.ToString() + ")}";
         break;
 
       case RoleType.Captain:
-        Layer.udpClient.Message = "{R(" + RoleType.Captain.ToString() + ")}";
+        Layer.udpClient.Message += "{R(" + RoleType.Captain.ToString() + ")}";
         break;
     }
   }
