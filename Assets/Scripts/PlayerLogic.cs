@@ -71,6 +71,7 @@ public class PlayerLogic : Layer
   private void DisconnectPressed()
   {
     Layer.tcpClient.Send(PackageType.Disconnected, Layer.Role.ToString());
+    Layer.Level = 1;
     Hide();
     startScreen.GetComponent<StartScreen>().Show();
   }
