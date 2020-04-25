@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 public enum Action { Reload, Fire }
 
@@ -27,6 +28,11 @@ public class PlayerLogic : Layer
   [SerializeField]
   private Button disconnectButton = null;
 
+  [SerializeField]
+  private Image blackScreen = null;
+  [SerializeField]
+  private VideoPlayer particles = null;
+
   // calibration
   [SerializeField]
   private Button startCalibrationButton = null;
@@ -39,6 +45,11 @@ public class PlayerLogic : Layer
   private Text flashlightStraightInstructions = null;
   [SerializeField]
   private Button confirmFlashlightStraightButton = null;
+
+  [SerializeField]
+  private GameObject button = null;
+  [SerializeField]
+  private GameObject videoStreamer = null;
   #endregion
 
   [SerializeField]
@@ -55,6 +66,19 @@ public class PlayerLogic : Layer
     confirmPhoneStraightButton.onClick.AddListener(ConfirmPhoneStraightPressed);
     confirmFlashlightStraightButton.onClick.AddListener(ConfirmFlashlightStraightPressed);
     actionButton.onClick.AddListener(ActionPressed);
+    button.GetComponent<Button>().onClick.AddListener(ButtonPressed);
+  }
+
+  private void ButtonPressed()
+  {
+    if (coolDown)
+      return;
+
+    Layer.tcpClient.Send(PackageType.Action, Layer.Role.ToString());
+    timeOnActionPressed = Time.time;
+    coolDown = true;
+
+    videoStreamer.GetComponent<StreamVideo>().Stream();
   }
 
   private void ActionPressed()
@@ -74,10 +98,20 @@ public class PlayerLogic : Layer
     Layer.Level = 1;
     Hide();
     startScreen.GetComponent<StartScreen>().Show();
+
+    blackScreen.GetComponent<Image>().enabled = true;
+    particles.Stop();
   }
 
   private void StartCalibrationPressed()
   {
+    blackScreen.GetComponent<Image>().enabled = !blackScreen.GetComponent<Image>().enabled;
+
+    if (particles.isPlaying)
+      particles.Stop();
+    else
+      particles.Play();
+
     confirmPhoneStraightButton.gameObject.SetActive(!confirmPhoneStraightButton.gameObject.active);
     phoneStraightInstructions.enabled = !phoneStraightInstructions.enabled;
 
@@ -112,8 +146,11 @@ public class PlayerLogic : Layer
     SetFlashlightStraightUI(false);
 
     Layer.tcpClient.Send(PackageType.Calibrate2, Layer.Role.ToString());
-     
+
     startCalibrationButton.image.color = Color.green;
+    
+    particles.Play();
+    blackScreen.GetComponent<Image>().enabled = false;
   }
   #endregion
 

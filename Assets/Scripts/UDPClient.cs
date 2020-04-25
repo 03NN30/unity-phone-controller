@@ -8,7 +8,7 @@ using UnityEngine;
 public class UDPClient
 {
   private readonly bool printMessageIn = false;
-  private readonly bool printMessageOut = true;
+  private readonly bool printMessageOut = false;
 
   public string ReceivedMessage { get; set; }
   public string Message { get; set; }

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using UnityEngine.Video;
 
 public class PlayerSelection : Layer
 {
@@ -23,6 +24,10 @@ public class PlayerSelection : Layer
   Button confirmCaptain = null;
   [SerializeField]
   Button backButton = null;
+  [SerializeField]
+  private Image blackScreen = null;
+  [SerializeField]
+  private VideoPlayer particles = null;
   #endregion
 
   public static bool oppsCommanderAvailable = true;
@@ -83,6 +88,9 @@ public class PlayerSelection : Layer
     initUDP();
     Hide();
     gameScreen.GetComponent<PlayerLogic>().Show();
+
+    blackScreen.GetComponent<Image>().enabled = false;
+    particles.Play();
   }
 
   void Start()
