@@ -59,7 +59,7 @@ public class StartScreen : Layer
     Layer.tcpClient.Send(PackageType.Connected, "");
   }
 
-  void InitTCP()
+  public static void InitTCP()
   {
     Layer.tcpClient = new TCPClient(ConnectionData.selectedIP, ConnectionData.portOutTCP);
     Layer.tcpClient.Initiate();
