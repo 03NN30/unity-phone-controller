@@ -5,13 +5,13 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Video;
 
 public class TCPClient
 {
   public Socket Master { get; set; }
   public string Id { get; set; }
+
+  public static bool Success = false;
 
   public List<RoleType> Roles { get; set; }
 
@@ -40,7 +40,7 @@ public class TCPClient
     {
       IAsyncResult result = Master.BeginConnect(endPoint, null, null);
 
-      bool success = result.AsyncWaitHandle.WaitOne(2000, true);
+      Success = result.AsyncWaitHandle.WaitOne(2000, true);
 
       if (Master.Connected)
         Master.EndConnect(result);
@@ -53,7 +53,7 @@ public class TCPClient
     }
     catch (Exception e)
     {
-      Debug.LogError(e.Message);
+      Debug.LogError("ERROR: " + e.Message);
       return false;
     }
 

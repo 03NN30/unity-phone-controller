@@ -45,7 +45,10 @@ public class PlayerSelection : Layer
   void BackPressed()
   {
     Hide();
-    Layer.tcpClient.Send(PackageType.Disconnected, "");
+
+    if (TCPClient.Success)
+      Layer.tcpClient.Send(PackageType.Disconnected, "");
+    
     startScreen.GetComponent<StartScreen>().Show();
   }
 
