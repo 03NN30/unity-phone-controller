@@ -4299,7 +4299,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Captain John \nCaptain Waldo Forstmann\n\r\nScript and 3D\n\n\nProgrammers\n\n\nSFX/Music\n\r\n"
+  m_Text: "Captain John \nCaptain Waldo Forstmann\n\r\nDesigners\n\n\nProgrammers\n\n\nSFX/Music\n\r\n"
 --- !u!222 &1280225075
 CanvasRenderer:
   m_ObjectHideFlags: 0
