@@ -17,7 +17,7 @@ public class Layer : MonoBehaviour
   public static int Level { get; set; }
   [HideInInspector]
   public static bool LevelChanged { get; set; }
-  [HideInInspector]
+  
   public static float TimeOnLevelChanged { get; set; }
 
   public virtual void Hide()

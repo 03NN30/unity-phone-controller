@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Video;
 
 public class TCPClient
 {
@@ -146,6 +148,10 @@ public class TCPClient
           Debug.Log("TCPClient: Entered Level " + Layer.Level);
           Layer.LevelChanged = true;       
         }
+        break;
+
+      case PackageType.Credits:
+        Credits.Trigger = true;
         break;
     }
   }
