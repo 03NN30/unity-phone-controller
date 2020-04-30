@@ -42,11 +42,6 @@ public class PlayerLogic : Layer
   private Button confirmPhoneStraightButton = null;
 
   [SerializeField]
-  private Text flashlightStraightInstructions = null;
-  [SerializeField]
-  private Button confirmFlashlightStraightButton = null;
-
-  [SerializeField]
   private GameObject button = null;
   [SerializeField]
   private GameObject videoStreamer = null;
@@ -64,7 +59,6 @@ public class PlayerLogic : Layer
     disconnectButton.onClick.AddListener(DisconnectPressed);
     startCalibrationButton.onClick.AddListener(StartCalibrationPressed);
     confirmPhoneStraightButton.onClick.AddListener(ConfirmPhoneStraightPressed);
-    confirmFlashlightStraightButton.onClick.AddListener(ConfirmFlashlightStraightPressed);
     actionButton.onClick.AddListener(ActionPressed);
     button.GetComponent<Button>().onClick.AddListener(ButtonPressed);
   }
@@ -114,8 +108,6 @@ public class PlayerLogic : Layer
 
     confirmPhoneStraightButton.gameObject.SetActive(!confirmPhoneStraightButton.gameObject.active);
     phoneStraightInstructions.enabled = !phoneStraightInstructions.enabled;
-
-    SetFlashlightStraightUI(false);
   }
   #endregion
 
@@ -126,29 +118,14 @@ public class PlayerLogic : Layer
     phoneStraightInstructions.enabled = visible;
   }
 
-  private void SetFlashlightStraightUI(bool visible)
-  {
-    confirmFlashlightStraightButton.gameObject.SetActive(visible);
-    flashlightStraightInstructions.enabled = visible;
-  }
-
   private void ConfirmPhoneStraightPressed()
   {
     SetPhoneStraightUI(false);
-    SetFlashlightStraightUI(true);
 
     Layer.tcpClient.Send(PackageType.Calibrate1, Layer.Role.ToString());
-  }
-
-  private void ConfirmFlashlightStraightPressed()
-  {
-    SetPhoneStraightUI(false);
-    SetFlashlightStraightUI(false);
-
-    Layer.tcpClient.Send(PackageType.Calibrate2, Layer.Role.ToString());
 
     startCalibrationButton.image.color = Color.green;
-    
+
     particles.Play();
     blackScreen.GetComponent<Image>().enabled = false;
   }
@@ -252,7 +229,6 @@ public class PlayerLogic : Layer
   {
     Hide();
     SetPhoneStraightUI(false);
-    SetFlashlightStraightUI(false);
 
     actionButton.GetComponent<Image>().sprite = greenSprite;
     Layer.Level = 1;
