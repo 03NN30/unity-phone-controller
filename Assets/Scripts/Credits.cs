@@ -62,9 +62,9 @@ public class Credits : Layer
 
       var res = Mathf.Lerp(0f, 1f, fractionOfJourney);
 
-      blackScreen.GetComponent<Image>().color = new Color(1f, 1f, 1f, res);
+      blackScreen.GetComponent<Image>().color = new Color(0.5865966f, 0.735849f, 0.7192654f, res);
 
-      deep.color = new Color(0.5865966f, 0.735849f, 0.7192654f, res);
+      deep.color = new Color(0f, 0f, 0f, res);
     }
     else if (Time.time - TimeOnVictory > fadeToWhitePeriod * 2)
     {
