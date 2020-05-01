@@ -5840,7 +5840,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Brent\r\nThomas Kramer\r\n\r\nAdam Streicher\nJonas Schickel\r\n\nChristian
+  m_Text: "Brent\r de Nef\nThomas Kramer\r\n\r\nAdam Streicher\nJonas Schickel\r\n\nChristian
     Hilpert\nValerian Daul\r\n\nJad Murad"
 --- !u!222 &1786348940
 CanvasRenderer:
