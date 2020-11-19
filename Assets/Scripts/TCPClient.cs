@@ -15,6 +15,8 @@ public class TCPClient
 
   public List<RoleType> Roles { get; set; }
 
+  private static Thread thread;
+
   public TCPClient(string host, int port)
   {
     Host = host;
@@ -29,6 +31,18 @@ public class TCPClient
   public string Host { get; set; }
 
   public int Port { get; set; }
+
+  private static void Quit()
+  {
+    Debug.Log("Aborting TCP thread.");
+    thread.Abort( );
+  }
+
+  [RuntimeInitializeOnLoadMethod]
+  private static void RunOnStart()
+  {
+    Application.quitting += Quit;
+  }
 
   public bool Initiate()
   {
@@ -57,7 +71,7 @@ public class TCPClient
       return false;
     }
 
-    Thread thread = new Thread(DataIn);
+    thread = new Thread(DataIn);
     thread.Start();
 
     return true;

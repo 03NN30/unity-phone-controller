@@ -17,6 +17,8 @@ public class UDPClient
   private UdpClient udpClient = null;
   private bool listener = true;
 
+  private static Thread receiveThread;
+
   public UDPClient(bool listener)
   {
     Message = "";
@@ -31,11 +33,23 @@ public class UDPClient
     if (listener) Listen();
   }
 
+  private static void Quit()
+  {
+    Debug.Log("Aborting UDP thread.");
+    receiveThread.Abort( );
+  }
+
+  [RuntimeInitializeOnLoadMethod]
+  private static void RunOnStart()
+  {
+    Application.quitting += Quit;
+  }
+
   public void Listen()
   {
     ReceivedMessage = "";
 
-    Thread receiveThread = new Thread(new ThreadStart(() =>
+    receiveThread = new Thread(new ThreadStart(() =>
     {
       UdpClient self = new UdpClient(ConnectionData.portInUDP);
       while (true)

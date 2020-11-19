@@ -9,7 +9,7 @@ public class ConnectionData : MonoBehaviour
   public const int portOutUDP = 5555;
   public const int portInUDP = 5556;
 
-  public const string domeIP = "192.168.0.101";
+  public const string domeIP = "192.168.0.102";
   public const string weIP = "192.168.2.104";
   public const string smIP = "192.168.178.39";
 
