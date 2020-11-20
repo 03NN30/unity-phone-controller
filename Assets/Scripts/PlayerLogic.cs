@@ -53,6 +53,8 @@ public class PlayerLogic : Layer
   private bool coolDown = false;
   private bool captureTimeOnLevelChange = true;
 
+  private bool currentlyCalibrating = false;
+
   #region Buttons
   private void OnEnable()
   {
@@ -99,6 +101,8 @@ public class PlayerLogic : Layer
 
   private void StartCalibrationPressed()
   {
+    currentlyCalibrating = true;
+
     blackScreen.GetComponent<Image>().enabled = !blackScreen.GetComponent<Image>().enabled;
 
     if (particles.isPlaying)
@@ -128,6 +132,8 @@ public class PlayerLogic : Layer
 
     particles.Play();
     blackScreen.GetComponent<Image>().enabled = false;
+
+    currentlyCalibrating = false;
   }
   #endregion
 
@@ -244,8 +250,15 @@ public class PlayerLogic : Layer
       // make sure UI disappears temporarily on level changed event
       if (!Layer.LevelChanged)
       {
-        if (Layer.Role == RoleType.OppsCommander)
+        if (currentlyCalibrating)
         {
+          Debug.Log("Sending gyro data for calibration.");
+          AddGyroToMessage();
+        }
+        else
+        {
+          if (Layer.Role == RoleType.OppsCommander)
+          {
           switch (Layer.Level)
           {
             case 0:
@@ -272,9 +285,9 @@ public class PlayerLogic : Layer
               AddAccelerometerToMessage(Action.Fire);
               break;
           }
-        }
-        else if (Layer.Role == RoleType.WeaponsOfficer)
-        {
+          }
+          else if (Layer.Role == RoleType.WeaponsOfficer)
+          {
           switch (Layer.Level)
           {
             case 0:
@@ -301,9 +314,9 @@ public class PlayerLogic : Layer
               AddGyroToMessage();
               break;
           }
-        }
-        else if (Layer.Role == RoleType.Captain)
-        {
+          }
+          else if (Layer.Role == RoleType.Captain)
+          {
           switch (Layer.Level)
           {
             case 0:
@@ -330,14 +343,14 @@ public class PlayerLogic : Layer
               AddAccelerometerToMessage(Action.Reload);
               break;
           }
+          }
         }
-
+        
         AddRoleToMessage();
         Layer.udpClient.Send();
       }
       else
       {
-        calibration.SetActive(false);
         action.SetActive(false);
       }
 
