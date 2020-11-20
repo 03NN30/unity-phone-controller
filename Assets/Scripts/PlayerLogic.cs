@@ -152,7 +152,6 @@ public class PlayerLogic : Layer
 
   private void AddGyroToMessage()
   {
-    calibration.SetActive(true);
     action.SetActive(false);
 
     if (Layer.gyroscope == null)
@@ -176,8 +175,6 @@ public class PlayerLogic : Layer
     else
       action.SetActive(true);
     
-    calibration.SetActive(false);
-
     switch (type)
     {
       case Action.Reload:
