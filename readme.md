@@ -1,4 +1,3 @@
-# Unity-Phone-Controller
+# Controller App For Deep
 
-Game controller for your android phone required by the Unity-based video game Deep.
-For more information take a look at [this](https://github.com/chillpert/deep).
+Game controller for your android phone required to play [Deep](https://github.com/chillpert/deep).
